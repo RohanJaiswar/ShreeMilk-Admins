@@ -3,158 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <title>Invoice - Shreeji Milk Center</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <style>
+    :root {
+      --primary: #14532D; /* Deep Green */
+      --text-main: #0F172A;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --bg-light: #f8fafc;
+    }
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
       padding: 40px;
       background: #f0f2f5;
-      color: #333;
+      color: var(--text-main);
     }
     .invoice-box {
       max-width: 800px;
       margin: auto;
-      padding: 40px 50px;
+      padding: 50px 60px;
       background: #fff;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-      border-top: 8px solid #14532D;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      position: relative;
     }
-    .header {
+    .invoice-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      border-bottom: 2px solid #e2e8f0;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--border);
       padding-bottom: 24px;
-      margin-bottom: 32px;
+      margin-bottom: 30px;
     }
     .brand-section {
       display: flex;
       align-items: center;
       gap: 16px;
     }
-    .logo-box {
-      background: #0F172A;
-      padding: 12px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
     .logo-box img {
-      max-height: 55px;
+      max-height: 60px;
     }
-    .brand-text h2 {
-      margin: 0;
-      font-size: 24px;
-      color: #14532D;
+    .brand-info h1 {
+      margin: 0 0 4px 0;
+      font-size: 26px;
       font-weight: 800;
-      letter-spacing: 1px;
+      color: var(--primary);
+      letter-spacing: 0.5px;
     }
-    .brand-text p {
-      margin: 2px 0 0 0;
-      font-size: 11px;
-      color: #64748b;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
+    .brand-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      max-width: 250px;
+      line-height: 1.5;
     }
     .header-right {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
       text-align: right;
     }
-    .title {
-      font-size: 32px;
-      color: #0F172A;
-      letter-spacing: 1px;
-      margin: 0 0 8px 0;
-      font-weight: 800;
+    .contact-info {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-top: 5px;
     }
-    .barcode-container {
-      text-align: right;
+    .contact-info strong {
+      color: var(--text-main);
+      display: block;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .qrcode-wrapper {
+      padding: 8px;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
     }
     
-    .info-section {
+    .meta-row {
       display: flex;
       justify-content: space-between;
-      margin-bottom: 40px;
-      gap: 40px;
+      margin-bottom: 30px;
+      background: var(--bg-light);
+      padding: 16px 20px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
     }
-    .info-col {
-      flex: 1;
+    .meta-col .label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      font-weight: 600;
     }
-    .info-col h3 {
+    .meta-col .val {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .bill-to {
+      margin-bottom: 30px;
+    }
+    .bill-to h3 {
       font-size: 12px;
-      color: #64748b;
+      color: var(--text-muted);
       text-transform: uppercase;
       letter-spacing: 1px;
       margin: 0 0 10px 0;
-      border-bottom: 1px solid #e2e8f0;
-      padding-bottom: 4px;
     }
-    .info-col p {
-      margin: 6px 0;
-      font-size: 14px;
-      color: #334155;
+    .bill-to p {
+      margin: 4px 0;
+      font-size: 15px;
+      color: var(--text-main);
     }
-    .info-col strong {
-      display: inline-block;
-      width: 130px;
-      color: #0F172A;
-      font-weight: 600;
+    .bill-to strong {
+      font-size: 18px;
+      display: block;
+      margin-bottom: 6px;
     }
 
-    table {
+    table.modern-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
     }
-    th, td {
-      padding: 14px 12px;
+    table.modern-table th, table.modern-table td {
+      padding: 14px 16px;
       text-align: left;
-      border-bottom: 1px solid #e2e8f0;
       font-size: 14px;
     }
-    th {
-      background: #f8fafc;
+    table.modern-table th {
+      background: var(--bg-light);
+      color: var(--text-muted);
       font-weight: 600;
-      color: #475569;
       text-transform: uppercase;
       font-size: 11px;
       letter-spacing: 0.5px;
+      border-bottom: 2px solid var(--border);
     }
-    .text-right {
-      text-align: right;
+    table.modern-table td {
+      border-bottom: 1px solid var(--border);
     }
-    .text-center {
-      text-align: center;
+    .center { text-align: center !important; }
+    .right { text-align: right !important; }
+    
+    .totals-container {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 40px;
     }
-    .total-row td {
-      font-weight: 700;
-      font-size: 16px;
-      border-top: 2px solid #0F172A;
-      color: #0F172A;
+    .totals-table {
+      width: 300px;
+      border-collapse: collapse;
+    }
+    .totals-table td {
+      padding: 10px 16px;
+      font-size: 14px;
+      color: var(--text-main);
+      border-bottom: 1px solid var(--border);
+    }
+    .totals-table td.label {
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+    .totals-table tr.grand-total td {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary);
+      border-bottom: none;
+      border-top: 2px solid var(--text-main);
+      padding-top: 16px;
     }
 
-    .footer {
-      margin-top: 50px;
+    .invoice-footer {
       display: flex;
       justify-content: space-between;
+      border-top: 1px solid var(--border);
+      padding-top: 30px;
+      font-size: 12px;
+    }
+    .terms {
+      color: var(--text-muted);
+      line-height: 1.8;
+    }
+    .terms h4 {
+      margin: 0 0 8px 0;
+      color: var(--text-main);
       font-size: 13px;
-      color: #64748b;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 24px;
     }
-    .footer-left strong {
-      color: #0F172A;
-      display: block;
-      margin-bottom: 4px;
-      font-size: 14px;
+    .signature {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
     }
-    .footer-right {
-      text-align: right;
+    .signature-line {
+      width: 150px;
+      border-top: 1px solid var(--text-main);
+      margin-top: 40px;
+      padding-top: 8px;
+      font-weight: 600;
     }
-    
+
     @media print {
       body {
         background: #fff;
@@ -163,7 +220,7 @@
       .invoice-box {
         box-shadow: none;
         border: none;
-        border-top: 8px solid #14532D;
+        border-radius: 0;
         padding: 0;
         max-width: 100%;
       }
@@ -171,121 +228,219 @@
   </style>
 </head>
 <body>
-
-  <div class="invoice-box">
-    <div class="header">
-      <div class="brand-section">
-        <div class="logo-box">
-          <img src="assets/logo-shree.png" alt="Shreeji Logo">
-        </div>
-        <div class="brand-text">
-          <h2>SHREEJI</h2>
-          <p>MILK CENTER</p>
-        </div>
-      </div>
-      <div class="header-right">
-        <h1 class="title">INVOICE</h1>
-        <div class="barcode-container">
-          <svg id="barcode"></svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="info-section">
-      <div class="info-col">
-        <h3>Invoice Details</h3>
-        <p><strong>Invoice Number:</strong> <span id="inv-no">INV-1043</span></p>
-        <p><strong>Date of Issue:</strong> <span id="inv-date"></span></p>
-        <p><strong>Payment Terms:</strong> Due on Receipt</p>
-        <p><strong>Outstanding Dues:</strong> <span style="color: #dc2626; font-weight: 700;">₹ 450.00</span></p>
-      </div>
-      <div class="info-col">
-        <h3>Billed To</h3>
-        <p style="font-weight: 700; font-size: 16px; color: #0F172A; margin-bottom: 4px;" id="inv-vendor">Patel Provision</p>
-        <p>Shop No. 4, Main Market Road<br>
-        Zone B (Central), City<br>
-        Phone: +91 76543 21098</p>
-      </div>
-    </div>
-
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 50%;">Item Description</th>
-          <th class="text-right">Unit Price</th>
-          <th class="text-center">Qty</th>
-          <th class="text-right">Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <div style="font-weight: 600; color: #0F172A;">Analog Cheez Paneer</div>
-            <div style="font-size: 12px; color: #64748b;">1kg Premium Pack</div>
-          </td>
-          <td class="text-right">₹ 240.00</td>
-          <td class="text-center">15</td>
-          <td class="text-right">₹ 3,600.00</td>
-        </tr>
-        <tr>
-          <td>
-            <div style="font-weight: 600; color: #0F172A;">Shree Dahi Can</div>
-            <div style="font-size: 12px; color: #64748b;">5kg Commercial Tub</div>
-          </td>
-          <td class="text-right">₹ 350.00</td>
-          <td class="text-center">5</td>
-          <td class="text-right">₹ 1,750.00</td>
-        </tr>
-        <tr class="total-row">
-          <td colspan="3" class="text-right">Grand Total</td>
-          <td class="text-right">₹ 5,350.00</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="footer">
-      <div class="footer-left">
-        <strong>Payment Information</strong>
-        <p style="margin: 4px 0 0 0; color: #dc2626; font-weight: 600;">Payments are currently accepted in CASH only.</p>
-        <p style="margin: 4px 0 0 0;">Please hand over the amount to the delivery partner.</p>
-      </div>
-      <div class="footer-right">
-        <strong style="color:#0F172A; font-size: 14px; display: block; margin-bottom: 4px;">Thank you for your business!</strong>
-        For queries: support@shreejimilk.com<br>
-        +91 98765 00000
-      </div>
-    </div>
-  </div>
+  <div id="invoices-container"></div>
 
   <script>
-    // Generate current date
     const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('inv-date').textContent = new Date().toLocaleDateString('en-IN', dateOptions);
+    const displayDate = new Date().toLocaleDateString('en-IN', dateOptions);
 
-    // Read params from URL for dynamic rendering (if opened via button)
     const urlParams = new URLSearchParams(window.location.search);
-    const orderId = urlParams.get('id') || 'ORD-1043';
-    const vendor = urlParams.get('vendor') || 'Patel Provision';
-    
-    document.getElementById('inv-no').textContent = orderId.replace('ORD', 'INV');
-    document.getElementById('inv-vendor').textContent = vendor;
+    const isBulk = urlParams.get('bulk') === 'true';
+    const orderIdParam = urlParams.get('id');
 
-    // Generate Barcode using Store ID / Order ID
-    JsBarcode("#barcode", orderId, {
-      format: "CODE128",
-      lineColor: "#333",
-      width: 1.5,
-      height: 40,
-      displayValue: true,
-      fontSize: 14,
-      background: "transparent"
-    });
+    async function loadInvoices() {
+      try {
+        const SUPABASE_URL = 'https://tqtvxtipqbnvyquljgtg.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_na3VEkRe9gb7Nysy5crL1g_oR-M2W9x';
+        
+        if (!window.supabase) {
+           throw new Error("Supabase library not loaded.");
+        }
+        
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Auto trigger print dialog after a slight delay to ensure barcode renders
-    setTimeout(() => {
-      window.print();
-    }, 500);
+        let orders = [];
+        if (orderIdParam) {
+          const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('id', orderIdParam);
+          if (error) throw error;
+          orders = data || [];
+        } else if (isBulk) {
+          const today = new Date().toISOString().split('T')[0];
+          const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .eq('order_date', today);
+          if (error) throw error;
+          orders = data || [];
+        } else {
+          orders = [{
+            id: 'ORD-1043',
+            vendor_name: 'Patel Provision',
+            vendor_zone: 'Zone B (Central)',
+            phone_number: '+91 76543 21098',
+            total_amount: 5350,
+            items: JSON.stringify([
+              { name: 'Analog Cheez Paneer', qty: 15, price: 240 },
+              { name: 'Shree Dahi Can', qty: 5, price: 350 }
+            ])
+          }];
+        }
+
+        if (orders.length === 0) {
+          document.getElementById('invoices-container').innerHTML = '<h2 style="text-align:center; margin-top:50px;">No orders found to print.</h2>';
+          return;
+        }
+
+        const container = document.getElementById('invoices-container');
+        let htmlContent = '';
+
+        orders.forEach((o, index) => {
+          const safeId = o.id ? String(o.id) : '';
+          const invNo = safeId ? safeId.substring(0, 8).toUpperCase() : 'N/A';
+          const vendorName = o.vendor_name || 'N/A';
+          const totalAmount = parseFloat(o.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+          
+          let items = [];
+          try {
+            items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
+          } catch(e) {}
+          
+          let itemsHtml = '';
+          if (items && items.length > 0) {
+            itemsHtml = items.map((item, i) => {
+              const qty = item.qty || item.quantity || 1;
+              const price = parseFloat(item.price || item.unit_price || 0);
+              const total = qty * price;
+              return `
+                <tr>
+                  <td class="center" style="color:var(--text-muted);">${i + 1}</td>
+                  <td><strong style="color:var(--text-main);">${item.name || item.product_name || 'Product'}</strong></td>
+                  <td class="center text-muted">—</td>
+                  <td class="center">${qty}</td>
+                  <td class="right">₹ ${price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                  <td class="right" style="font-weight:600;">₹ ${total.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</td>
+                </tr>
+              `;
+            }).join('');
+          } else {
+            itemsHtml = `<tr><td colspan="6" class="center">No items available</td></tr>`;
+          }
+
+          const pageBreak = index < orders.length - 1 ? 'page-break-after: always;' : '';
+
+          htmlContent += `
+            <div class="invoice-box" style="${pageBreak}">
+              
+              <div class="invoice-header">
+                <div class="brand-section">
+                  <div class="logo-box">
+                    <img src="assets/logo-shree.png" alt="Logo" onerror="this.style.display='none'">
+                  </div>
+                  <div class="brand-info">
+                    <h1>SHREE JI MILK CENTER</h1>
+                    <p>Kamgar Nagar, S. G. Barve Marg, Station Road, Kurla (E.), Mumbai - 400 024.</p>
+                  </div>
+                </div>
+                <div class="header-right">
+                  <div class="contact-info">
+                    <strong>Contact Us</strong>
+                    8850853778<br>
+                    7718950155
+                  </div>
+                  <div class="qrcode-wrapper" id="qrcode-${safeId}"></div>
+                </div>
+              </div>
+
+              <div class="meta-row">
+                <div class="meta-col">
+                  <div class="label">Invoice Number</div>
+                  <div class="val">INV-${invNo}</div>
+                </div>
+                <div class="meta-col">
+                  <div class="label">Date of Issue</div>
+                  <div class="val">${displayDate}</div>
+                </div>
+              </div>
+
+              <div class="bill-to">
+                <h3>Billed To (M/s.)</h3>
+                <strong>${vendorName}</strong>
+                <p>${o.vendor_zone || 'Address not provided'}</p>
+                <p>Phone: ${o.phone_number || 'N/A'}</p>
+              </div>
+
+              <table class="modern-table">
+                <thead>
+                  <tr>
+                    <th class="center" style="width: 8%;">Sr. No.</th>
+                    <th style="width: 40%;">Particular</th>
+                    <th class="center" style="width: 12%;">Tray Return</th>
+                    <th class="center" style="width: 10%;">Qty</th>
+                    <th class="right" style="width: 15%;">Rate</th>
+                    <th class="right" style="width: 15%;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemsHtml}
+                </tbody>
+              </table>
+
+              <div class="totals-container">
+                <table class="totals-table">
+                  <tr>
+                    <td class="label">Advance (ADV.)</td>
+                    <td class="right">—</td>
+                  </tr>
+                  <tr>
+                    <td class="label">Balance (BAL.)</td>
+                    <td class="right">—</td>
+                  </tr>
+                  <tr class="grand-total">
+                    <td class="label" style="color:var(--primary);">TOTAL</td>
+                    <td class="right">₹ ${totalAmount}</td>
+                  </tr>
+                </table>
+              </div>
+
+              <div class="invoice-footer">
+                <div class="terms">
+                  <h4>Terms & Conditions</h4>
+                  <div>• Goods Once Sold Will Not Be Taken Back.</div>
+                  <div>• No Exchange No Return.</div>
+                  <div>• Milk & Milk Products Manufacture.</div>
+                  <div style="margin-top: 6px; font-weight: 600;">E. & O.E.</div>
+                </div>
+                <div class="signature">
+                  <div class="signature-line">For Shree Ji Milk Center</div>
+                </div>
+              </div>
+
+            </div>
+          `;
+        });
+
+        container.innerHTML = htmlContent;
+
+        orders.forEach(o => {
+          if (o.id) {
+            const safeId = String(o.id);
+            new QRCode(document.getElementById(`qrcode-${safeId}`), {
+              text: `INV-${safeId.substring(0, 8).toUpperCase()}`,
+              width: 100,
+              height: 100,
+              colorDark : "#0F172A",
+              colorLight : "#ffffff",
+              correctLevel : QRCode.CorrectLevel.M
+            });
+          }
+        });
+
+        setTimeout(() => { window.print(); }, 1000);
+
+      } catch (err) {
+        console.error("Error loading invoices:", err);
+        document.getElementById('invoices-container').innerHTML = '<h2 style="color:red; text-align:center;">Failed to load invoices.</h2>';
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadInvoices);
+    } else {
+      loadInvoices();
+    }
   </script>
-
 </body>
 </html>
