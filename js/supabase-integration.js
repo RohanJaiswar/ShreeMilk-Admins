@@ -130,6 +130,71 @@ async function fetchProducts() {
 }
 
 // =========================================================================
+// TRANSACTIONS MODULE
+// =========================================================================
+
+async function fetchTransactions() {
+    const tableBody = document.getElementById('transactions_table_body');
+    if (!tableBody) return; // Only run on transactions page
+
+    try {
+        const { data: transactions, error } = await supabaseClient
+            .from('transactions')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (!transactions || transactions.length === 0) {
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No transactions found.</td></tr>';
+            return;
+        }
+
+        let rowsHTML = '';
+        transactions.forEach(t => {
+            const date = new Date(t.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+            const txnId = t.transaction_ref || (t.id ? t.id.substring(0, 8).toUpperCase() : 'N/A');
+            const entityName = t.vendor_name || t.delivery_partner_name || '—';
+            const amount = parseFloat(t.amount || 0).toLocaleString('en-IN');
+            
+            let paymentIcon = 'wallet-outline';
+            let tagClass = 'tag-info';
+            const mode = (t.payment_mode || '').toLowerCase();
+            
+            if (mode.includes('upi')) {
+                paymentIcon = 'phone-portrait-outline';
+                tagClass = 'tag-purple';
+            } else if (mode.includes('bank') || mode.includes('transfer')) {
+                paymentIcon = 'time-outline';
+                tagClass = 'tag-warning';
+            } else if (mode.includes('cash')) {
+                paymentIcon = 'wallet-outline';
+                tagClass = 'tag-success';
+            }
+            
+            const paymentModeDisplay = t.payment_mode ? (t.payment_mode.charAt(0).toUpperCase() + t.payment_mode.slice(1)) : 'Unknown';
+
+            rowsHTML += `
+              <tr>
+                <td>${date}</td>
+                <td style="font-family: monospace; color: var(--text-secondary);">${txnId}</td>
+                <td style="font-weight: 500;">${entityName}</td>
+                <td style="font-weight: 600;">₹ ${amount}</td>
+                <td><span class="tag ${tagClass}"><ion-icon name="${paymentIcon}"></ion-icon> ${paymentModeDisplay}</span></td>
+                <td><span class="tag tag-success">Completed</span></td>
+              </tr>
+            `;
+        });
+
+        tableBody.innerHTML = rowsHTML;
+
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+        tableBody.innerHTML = \`<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading transactions.</td></tr>\`;
+    }
+}
+
+// =========================================================================
 // ORDERS MODULE
 // =========================================================================
 
@@ -481,6 +546,7 @@ function initSupabaseForms() {
     // Fetch initial data for other pages
     fetchDirectory();
     fetchProducts();
+    fetchTransactions();
 
     /* ----------------------------------------------------------------------
      * ADD NEW VENDOR LOGIC

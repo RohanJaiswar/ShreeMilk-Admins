@@ -123,31 +123,8 @@
                 <th>Status</th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td>28 Apr 2026</td>
-                <td style="font-family: monospace; color: var(--text-secondary);">TXN-9021A</td>
-                <td style="font-weight: 500;">Ramesh Dairy</td>
-                <td style="font-weight: 600;">₹ 1,250</td>
-                <td><span class="tag tag-info"><ion-icon name="wallet-outline"></ion-icon> Cash</span></td>
-                <td><span class="tag tag-success">Completed</span></td>
-              </tr>
-              <tr>
-                <td>28 Apr 2026</td>
-                <td style="font-family: monospace; color: var(--text-secondary);">TXN-9022B</td>
-                <td style="font-weight: 500;">Sharma Cold Store</td>
-                <td style="font-weight: 600;">₹ 3,400</td>
-                <td><span class="tag tag-purple"><ion-icon name="phone-portrait-outline"></ion-icon> UPI</span></td>
-                <td><span class="tag tag-success">Completed</span></td>
-              </tr>
-              <tr>
-                <td>27 Apr 2026</td>
-                <td style="font-family: monospace; color: var(--text-secondary);">TXN-9019C</td>
-                <td style="font-weight: 500;">Patel Provision</td>
-                <td style="font-weight: 600;">₹ 850</td>
-                <td><span class="tag tag-warning"><ion-icon name="time-outline"></ion-icon> Bank Transfer</span></td>
-                <td><span class="tag tag-warning">Pending</span></td>
-              </tr>
+            <tbody id="transactions_table_body">
+              <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading transactions...</td></tr>
             </tbody>
           </table>
         </div>
@@ -157,6 +134,8 @@
   </div><!-- /main-wrapper -->
 </div><!-- /layout -->
 <!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-integration.js"></script>
 <script src="js/app.js"></script>
 
 </body>
