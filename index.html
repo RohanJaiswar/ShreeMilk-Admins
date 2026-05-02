@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shreeji Milk Center — Admin Dashboard</title>
+  <meta name="description" content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+  <!-- ═══════════════ SIDER ═══════════════ -->
+  <aside class="sider" id="sider">
+    <div class="sider-logo">
+      <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
+      <div class="sider-logo-text">Milk Center</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-item active" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span class="nav-label">Dashboard</span>
+      </a>
+      <a href="delivery.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery & Orders</span>
+      </a>
+      <a href="vendors.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors & Logistics</span>
+      </a>
+      <a href="transactions.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions and Reports</span>
+      </a>
+      <a href="settings.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span class="nav-label">Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+  <div class="main-wrapper" id="mainWrapper">
+
+    <!-- ── HEADER ── -->
+    <header class="header">
+      <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon name="menu-outline"></ion-icon></button>
+      <div class="header-breadcrumb">
+        Dashboard &rsaquo; <span>Overview</span>
+      </div>
+      <div class="header-right">
+        <!-- Brand Logo in Top Right -->
+        <div class="header-logo" style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+          <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
+        </div>
+
+        <span class="header-date" id="headerDate"></span>
+        <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+          <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+        </button>
+        <div class="user-info" onclick="toggleProfileMenu(event)">
+          <div class="user-avatar">RS</div>
+          <div style="display:flex;flex-direction:column;justify-content:center;">
+            <span class="user-name">Rahul Sharma</span>
+            <span class="user-role">Administrator</span>
+          </div>
+          <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
+          
+          <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+            <div class="profile-header">
+              <div class="profile-avatar-small">RS</div>
+              <div class="profile-details">
+                <span class="profile-name">Rahul Sharma</span>
+                <span class="profile-email">rahul@shreejimilk.com</span>
+              </div>
+            </div>
+            <div class="profile-menu">
+              <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+              <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+            </div>
+            <div class="profile-logout">
+              <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <main class="content">
+
+      <!-- ─── SECTION 7: QUICK ACTIONS (top for easy access) ─── -->
+      <div class="quick-actions" id="quickActions">
+        <!-- JS rendered -->
+      </div>
+
+      <!-- ─── SECTION 1: KPI CARDS ─── -->
+      <div class="section-title">
+        Key Performance Indicators
+        <button class="btn btn-ghost btn-sm" onclick="toggleKpiMask()" style="margin-left: auto;">
+          <ion-icon name="eye-off-outline" id="kpiEyeIcon"></ion-icon> <span id="kpiMaskText" style="margin-left:4px;">Mask</span>
+        </button>
+      </div>
+      <div class="kpi-grid" id="kpiGrid"><!-- JS rendered --></div>
+
+      <!-- ─── SECTION 2: CHARTS ─── -->
+      <div class="section-title">Monthly Analytics</div>
+      <div class="charts-grid">
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span style="display:flex;align-items:center;gap:6px"><ion-icon name="trending-up-outline" style="color:var(--success);font-size:16px"></ion-icon> Monthly Revenue vs Collection</span>
+            <span style="font-size:11px;color:#94a3b8;font-weight:400">Nov 2025 – Apr 2026</span>
+          </div>
+          <div class="chart-body" style="height:260px">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span style="display:flex;align-items:center;gap:6px"><ion-icon name="trending-down-outline" style="color:var(--danger);font-size:16px"></ion-icon> Order Trend</span>
+            <span style="font-size:11px;color:#94a3b8;font-weight:400">6-month view</span>
+          </div>
+          <div class="chart-body" style="height:260px">
+            <canvas id="orderChart"></canvas>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-header">
+            <span style="display:flex;align-items:center;gap:6px"><ion-icon name="pie-chart-outline" style="color:var(--primary);font-size:16px"></ion-icon> Product Sales Mix</span>
+          </div>
+          <div class="chart-body" style="height:260px">
+            <canvas id="donutChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─── SECTION 3: VENDOR TABLE ─── -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <span class="table-toolbar-title" style="display:flex;align-items:center;gap:6px"><ion-icon name="storefront-outline" style="color:var(--primary);font-size:18px"></ion-icon> Top Vendors &amp; Collection Status</span>
+          <input class="search-input" id="vendorSearch" type="text" placeholder="Search vendor..." />
+          <select class="filter-select" id="vendorZone">
+            <option value="all">All Zones</option>
+            <option value="Zone A">Zone A</option>
+            <option value="Zone B">Zone B</option>
+            <option value="Zone C">Zone C</option>
+          </select>
+          <select class="filter-select" id="vendorStatus">
+            <option value="all">All Status</option>
+            <option value="Paid">Paid</option>
+            <option value="Overdue">Overdue</option>
+            <option value="Partial">Partial</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Vendor Name</th>
+                <th>Outlet / Zone</th>
+                <th data-sort="orders" style="text-align:right">This Month Orders <span class="sort-icon"><ion-icon name="swap-vertical-outline"></ion-icon></span></th>
+                <th data-sort="due" style="text-align:right">Amount Due <span class="sort-icon"><ion-icon name="swap-vertical-outline"></ion-icon></span></th>
+                <th>Last Payment</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="vendorTbody"><!-- JS rendered --></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── SECTION 4: PRODUCTS TABLE ─── -->
+      <div class="table-card">
+        <div class="table-toolbar">
+          <span class="table-toolbar-title" style="display:flex;align-items:center;gap:6px"><ion-icon name="water-outline" style="color:var(--primary);font-size:18px"></ion-icon> Top Ordered Products</span>
+          <div class="toggle-group">
+            <button class="toggle-btn active" data-period="month">This Month</button>
+            <button class="toggle-btn" data-period="week">This Week</button>
+            <button class="toggle-btn" data-period="today">Today</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th style="text-align:right">Units Ordered</th>
+                <th>Revenue</th>
+                <th>Avg Daily Orders</th>
+                <th>Stock Alert</th>
+              </tr>
+            </thead>
+            <tbody id="productsTbody"><!-- JS rendered --></tbody>
+          </table>
+        </div>
+      </div>
+
+
+
+      <!-- ─── SECTION 6: DELIVERY STATUS ─── -->
+      <div class="section-title" style="display:flex;align-items:center;gap:16px">
+        <span style="display:flex;align-items:center;gap:6px"><ion-icon name="bicycle-outline" style="color:var(--primary);font-size:20px"></ion-icon> Delivery Status — Today</span>
+        <span class="live-badge"><span class="live-dot"></span> Live</span>
+        <span id="lastRefresh" style="font-size:11px;color:#94a3b8;font-weight:400;margin-left:auto"></span>
+      </div>
+
+      <div class="card" style="margin-bottom:24px">
+        <div class="card-body">
+          <div class="progress-section">
+
+            <!-- Circle -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;min-width:140px">
+              <div id="deliveryCircle"><!-- JS rendered --></div>
+              <div style="font-size:12px;color:#64748b;font-weight:500">Delivered Today</div>
+            </div>
+
+            <!-- Agents Table -->
+            <div style="flex:1;overflow-x:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Agent</th>
+                    <th>Zone</th>
+                    <th style="color:#52c41a">Delivered</th>
+                    <th style="color:#ff4d4f">Missed</th>
+                    <th style="color:#fa8c16">Pending</th>
+                    <th>Collected</th>
+                  </tr>
+                </thead>
+                <tbody id="agentsTbody"><!-- JS rendered --></tbody>
+              </table>
+
+              <!-- Missed Deliveries Expandable -->
+              <div class="expand-panel" style="margin-top:12px">
+                <div class="expand-header">
+                  <span style="display:flex;align-items:center;gap:6px"><ion-icon name="alert-circle-outline" style="color:var(--warning);font-size:16px"></ion-icon> Missed Deliveries (6 customers)</span>
+                  <span class="expand-arrow"><ion-icon name="chevron-down-outline"></ion-icon></span>
+                </div>
+                <div class="expand-body" id="missedList"><!-- JS rendered --></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main><!-- /content -->
+  </div><!-- /main-wrapper -->
+</div><!-- /layout -->
+
+<!-- Scripts -->
+<script src="js/data.js"></script>
+<script src="js/ai.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

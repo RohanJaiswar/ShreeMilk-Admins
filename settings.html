@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shreeji Milk Center — Settings</title>
+  <meta name="description" content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+  <!-- ═══════════════ SIDER ═══════════════ -->
+  <aside class="sider" id="sider">
+    <div class="sider-logo">
+      <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
+      <div class="sider-logo-text">Milk Center</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span class="nav-label">Dashboard</span>
+      </a>
+      <a href="delivery.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery & Orders</span>
+      </a>
+      <a href="vendors.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors & Logistics</span>
+      </a>
+      <a href="transactions.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions and Reports</span>
+      </a>
+      <a href="settings.html" class="nav-item active" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span class="nav-label">Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+  <div class="main-wrapper" id="mainWrapper">
+
+    <!-- ── HEADER ── -->
+    <header class="header">
+      <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon name="menu-outline"></ion-icon></button>
+      <div class="header-breadcrumb">
+        Dashboard &rsaquo; <span>Settings</span>
+      </div>
+      <div class="header-right">
+        <!-- Brand Logo in Top Right -->
+        <div class="header-logo" style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+          <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
+        </div>
+
+        <span class="header-date" id="headerDate"></span>
+        <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+          <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+        </button>
+        <div class="user-info" onclick="toggleProfileMenu(event)">
+          <div class="user-avatar">RS</div>
+          <div style="display:flex;flex-direction:column;justify-content:center;">
+            <span class="user-name">Rahul Sharma</span>
+            <span class="user-role">Administrator</span>
+          </div>
+          <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
+          
+          <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+            <div class="profile-header">
+              <div class="profile-avatar-small">RS</div>
+              <div class="profile-details">
+                <span class="profile-name">Rahul Sharma</span>
+                <span class="profile-email">rahul@shreejimilk.com</span>
+              </div>
+            </div>
+            <div class="profile-menu">
+              <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+              <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+            </div>
+            <div class="profile-logout">
+              <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <main class="content">
+      <div class="section-title">System Settings</div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 24px;">
+        
+        <!-- Profile Settings -->
+        <div class="card">
+          <div class="card-header"><div class="card-title"><ion-icon name="person-outline"></ion-icon> Admin Profile</div></div>
+          <div class="card-body">
+             <div class="form-group"><label class="form-label">Full Name</label><input type="text" class="form-control" value="Rahul Sharma" /></div>
+             <div class="form-group"><label class="form-label">Email Address</label><input type="email" class="form-control" value="rahul@shreejimilk.com" /></div>
+             <div class="form-group"><label class="form-label">Contact Number</label><input type="text" class="form-control" value="+91 98765 00000" /></div>
+             <button class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px;">Save Changes</button>
+          </div>
+        </div>
+
+        <!-- Data Management & Export -->
+        <div class="card">
+          <div class="card-header"><div class="card-title"><ion-icon name="server-outline"></ion-icon> Data Management</div></div>
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 16px;">
+             <p style="font-size: 13px; color: var(--text-muted);">Manage your system data, create backups, and export records for accounting purposes.</p>
+             
+             <div style="border: 1px solid var(--border); border-radius: 8px; padding: 16px;">
+               <div style="font-weight: 600; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                 <ion-icon name="document-text-outline" style="color: var(--success);"></ion-icon> Export Database
+               </div>
+               <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Download a complete excel sheet containing all vendors, deliveries, and transactions.</p>
+               <button class="btn btn-success" style="width: 100%; justify-content: center;" onclick="alert('Downloading master_data.xlsx...')">
+                 <ion-icon name="download-outline"></ion-icon> Export as Excel Sheet
+               </button>
+             </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- New Product Management Section -->
+      <div class="section-title" style="margin-top: 32px;">Product Management</div>
+      
+      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; margin-bottom: 32px;">
+        
+        <!-- Add Product Form -->
+        <div style="flex: 1; min-width: 300px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><ion-icon name="cube-outline"></ion-icon> Add New Product</div></div>
+            <div class="card-body">
+               <div class="form-group">
+                 <label class="form-label">Product Name <span style="color:red">*</span></label>
+                 <input type="text" id="p_name" class="form-control" placeholder="e.g. Shree Dahi Can" required />
+               </div>
+               
+               <div class="form-row">
+                 <div class="form-group">
+                   <label class="form-label">Category <span style="color:red">*</span></label>
+                   <select id="p_category" class="form-control" required>
+                     <option>Milk</option>
+                     <option>Paneer</option>
+                     <option>Curd/Dahi</option>
+                     <option>By-products</option>
+                   </select>
+                 </div>
+                 <div class="form-group">
+                   <label class="form-label">Unit Weight <span style="color:red">*</span></label>
+                   <input type="text" id="p_weight" class="form-control" placeholder="e.g. 5kg, 1L" required />
+                 </div>
+               </div>
+
+               <div class="form-group">
+                 <label class="form-label">Base Price (₹) <span style="color:red">*</span></label>
+                 <input type="number" id="p_price" class="form-control" placeholder="0.00" required />
+               </div>
+
+               <div class="form-group">
+                 <label class="form-label">Product Image</label>
+                 <label style="display: block; border: 2px dashed var(--border); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; color: var(--text-muted); background: #fafbfc; transition: var(--transition);" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                   <ion-icon name="cloud-upload-outline" style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></ion-icon>
+                   <div style="font-size: 13px; font-weight: 500; color: var(--text-primary);">Click to upload product photo</div>
+                   <div style="font-size: 11px; margin-top: 4px;">PNG, JPG up to 5MB</div>
+                   <input type="file" id="p_image" style="display: none;" accept="image/*" />
+                 </label>
+               </div>
+
+               <button id="btn_add_product" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px; padding: 12px;"><ion-icon name="add-circle-outline"></ion-icon> Add to Database</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Product Database Table -->
+        <div style="flex: 2; min-width: 350px;">
+          <div class="card">
+            <div class="card-header"><div class="card-title"><ion-icon name="list-outline"></ion-icon> Active Products Database</div></div>
+            <div class="card-body" style="padding: 0; overflow-x: auto;">
+               <table>
+                 <thead>
+                   <tr>
+                     <th>Image</th>
+                     <th>Product Name</th>
+                     <th>Category</th>
+                     <th>Unit</th>
+                     <th>Price</th>
+                     <th>Action</th>
+                   </tr>
+                 </thead>
+                 <tbody id="products_table_body">
+                   <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading products...</td></tr>
+                 </tbody>
+               </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main><!-- /content -->
+  </div><!-- /main-wrapper -->
+</div><!-- /layout -->
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/supabase-integration.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>

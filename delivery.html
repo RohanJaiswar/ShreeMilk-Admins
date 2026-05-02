@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shreeji Milk Center — Delivery &amp; Orders</title>
+  <meta name="description" content="Live order management and delivery tracking for Shreeji Milk Center." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <!-- Ionicons -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ── TAB SYSTEM ── */
+    .page-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
+    }
+    .page-tab {
+      padding: 10px 24px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color .2s, border-color .2s;
+      user-select: none;
+    }
+    .page-tab:hover { color: var(--primary); }
+    .page-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ── STAT BAR ── */
+    .stat-bar {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2, #f8fafc);
+      flex-wrap: wrap;
+    }
+    .stat-bar-item {
+      flex: 1;
+      padding: 18px 20px;
+      border-right: 1px solid var(--border);
+      text-align: center;
+      min-width: 140px;
+    }
+    .stat-bar-item:last-child { border-right: none; }
+    .stat-bar-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 6px;
+    }
+    .stat-bar-value {
+      font-size: 26px;
+      font-weight: 700;
+    }
+
+    /* ── TABLE FILTER BAR ── */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: var(--surface-2, #f8fafc);
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 7px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text-primary);
+      outline: none;
+      transition: border-color .2s;
+    }
+    .filter-bar input:focus,
+    .filter-bar select:focus { border-color: var(--primary); }
+    .filter-bar input { min-width: 180px; }
+
+    /* ── LOADING SKELETON ── */
+    .skeleton-row td {
+      background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+      background-size: 400% 100%;
+      animation: shimmer 1.5s ease-in-out infinite;
+      border-radius: 4px;
+      height: 16px;
+    }
+    @keyframes shimmer {
+      0% { background-position: 100% 0; }
+      100% { background-position: -100% 0; }
+    }
+
+    /* ── ORDER ITEMS EXPAND ── */
+    .items-detail {
+      display: none;
+      padding: 10px 16px 10px 28px;
+      background: var(--surface-2, #f8fafc);
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+    .items-detail.open { display: block; }
+    .items-detail ul { margin: 0; padding-left: 18px; }
+    .items-detail li { padding: 3px 0; }
+
+    /* ── STATUS CHANGE INLINE ── */
+    .status-select {
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      background: var(--surface);
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-muted);
+    }
+    .empty-state ion-icon {
+      font-size: 48px;
+      display: block;
+      margin: 0 auto 16px;
+      opacity: .4;
+    }
+    .empty-state p { font-size: 14px; margin: 0; }
+
+    /* ── REFRESH BADGE ── */
+    .live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--success, #16a34a);
+      font-weight: 600;
+      background: rgba(22,163,74,.08);
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+    .live-dot {
+      width: 7px; height: 7px;
+      background: var(--success, #16a34a);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { opacity: 1; }
+      50% { opacity: .3; }
+    }
+
+    /* Scrollable tbody */
+    .orders-table-wrap {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+    .orders-table-wrap thead {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--surface);
+    }
+  </style>
+</head>
+<body>
+
+<div class="overlay" id="overlay"></div>
+
+<div class="layout">
+
+  <!-- ═══════════════ SIDER ═══════════════ -->
+  <aside class="sider" id="sider">
+    <div class="sider-logo">
+      <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
+      <div class="sider-logo-text">Milk Center</div>
+    </div>
+    <nav class="nav-menu">
+      <a href="index.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span class="nav-label">Dashboard</span>
+      </a>
+      <a href="delivery.html" class="nav-item active" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery &amp; Orders</span>
+      </a>
+      <a href="vendors.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors &amp; Logistics</span>
+      </a>
+      <a href="transactions.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions and Reports</span>
+      </a>
+      <a href="settings.html" class="nav-item" style="text-decoration: none;">
+        <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span class="nav-label">Settings</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+  <div class="main-wrapper" id="mainWrapper">
+
+    <!-- ── HEADER ── -->
+    <header class="header">
+      <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon name="menu-outline"></ion-icon></button>
+      <div class="header-breadcrumb">
+        Dashboard &rsaquo; <span>Delivery &amp; Orders</span>
+      </div>
+      <div class="header-right">
+        <div class="header-logo" style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+          <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
+        </div>
+        <span class="header-date" id="headerDate"></span>
+        <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+          <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+        </button>
+        <div class="user-info" onclick="toggleProfileMenu(event)">
+          <div class="user-avatar">RS</div>
+          <div style="display:flex;flex-direction:column;justify-content:center;">
+            <span class="user-name">Rahul Sharma</span>
+            <span class="user-role">Administrator</span>
+          </div>
+          <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
+          <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+            <div class="profile-header">
+              <div class="profile-avatar-small">RS</div>
+              <div class="profile-details">
+                <span class="profile-name">Rahul Sharma</span>
+                <span class="profile-email">rahul@shreejimilk.com</span>
+              </div>
+            </div>
+            <div class="profile-menu">
+              <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+              <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+            </div>
+            <div class="profile-logout">
+              <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══════════════ CONTENT ═══════════════ -->
+    <main class="content">
+      <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom: 20px;">
+        <div class="section-title" style="margin-bottom:0;">Delivery &amp; Orders</div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span class="live-badge" id="liveBadge"><span class="live-dot"></span> Live</span>
+          <button class="btn btn-outline btn-sm" onclick="refreshOrders()" id="refreshBtn">
+            <ion-icon name="refresh-outline"></ion-icon> Refresh
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="window.open('invoice.html?bulk=true', '_blank')">
+            <ion-icon name="print-outline"></ion-icon> Bulk Print
+          </button>
+        </div>
+      </div>
+
+      <!-- ── TABS ── -->
+      <div class="page-tabs">
+        <div class="page-tab active" id="tab-orders" onclick="switchTab('orders')">
+          <ion-icon name="receipt-outline"></ion-icon> Today's Orders
+        </div>
+        <div class="page-tab" id="tab-delivery" onclick="switchTab('delivery')">
+          <ion-icon name="bicycle-outline"></ion-icon> Delivery Tracking
+        </div>
+      </div>
+
+      <!-- ══════════ TAB: ORDERS ══════════ -->
+      <div class="tab-panel active" id="panel-orders">
+
+        <!-- STAT BAR -->
+        <div class="card" style="margin-bottom: 24px; overflow: hidden;">
+          <div class="stat-bar">
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Total Orders Today</div>
+              <div class="stat-bar-value" id="stat-total" style="color: var(--text-primary);">—</div>
+            </div>
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Pending / Processing</div>
+              <div class="stat-bar-value" id="stat-pending" style="color: var(--warning, #f59e0b);">—</div>
+            </div>
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Delivered</div>
+              <div class="stat-bar-value" id="stat-delivered" style="color: var(--success, #16a34a);">—</div>
+            </div>
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Total Value</div>
+              <div class="stat-bar-value" id="stat-value" style="color: var(--primary);">—</div>
+            </div>
+          </div>
+
+          <!-- FILTER BAR -->
+          <div class="filter-bar">
+            <ion-icon name="search-outline" style="color:var(--text-muted);"></ion-icon>
+            <input type="text" id="orderSearch" placeholder="Search vendor name…" oninput="applyFilters()" />
+            <select id="filterZone" onchange="applyFilters()">
+              <option value="">All Zones</option>
+            </select>
+            <select id="filterStatus" onchange="applyFilters()">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+              <option value="dispatched">Dispatched</option>
+              <option value="delivered">Delivered</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <input type="date" id="filterDate" onchange="applyFilters()" style="max-width:160px;" />
+            <span style="margin-left:auto; font-size:12px; color:var(--text-muted);" id="orderCount">0 orders</span>
+          </div>
+
+          <!-- ORDERS TABLE -->
+          <div class="orders-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:32px;"></th>
+                  <th>Order ID</th>
+                  <th>Vendor</th>
+                  <th>Zone</th>
+                  <th>Phone</th>
+                  <th>Items Summary</th>
+                  <th style="text-align:right;">Amount</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders_table_body">
+                <!-- Loading skeleton -->
+                <tr class="skeleton-row"><td></td><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="skeleton-row"><td></td><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+                <tr class="skeleton-row"><td></td><td>&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /panel-orders -->
+
+      <!-- ══════════ TAB: DELIVERY TRACKING ══════════ -->
+      <div class="tab-panel" id="panel-delivery">
+
+        <!-- Delivery Stats -->
+        <div class="card" style="margin-bottom: 24px; overflow: hidden;">
+          <div class="stat-bar">
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Dispatched Orders</div>
+              <div class="stat-bar-value" id="d-stat-dispatched" style="color: var(--primary);">—</div>
+            </div>
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Delivered</div>
+              <div class="stat-bar-value" id="d-stat-delivered" style="color: var(--success, #16a34a);">—</div>
+            </div>
+            <div class="stat-bar-item">
+              <div class="stat-bar-label">Cancelled</div>
+              <div class="stat-bar-value" id="d-stat-cancelled" style="color: var(--danger, #dc2626);">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Order Cards Grid -->
+        <div class="section-title" style="margin-bottom:12px;">Order Fulfillment Board</div>
+        <div id="delivery_cards_grid" style="display:grid; grid-template-columns: repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:32px;">
+          <!-- Cards injected here -->
+          <div style="color:var(--text-muted); font-size:13px; padding:20px;">Loading orders…</div>
+        </div>
+
+        <!-- Delivery Partners Table -->
+        <div class="section-title" style="margin-bottom:12px;">Delivery Tracking &amp; Collections</div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><ion-icon name="location-outline"></ion-icon> Live Tracking &amp; Cash Collected</div>
+          </div>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Delivery Partner</th>
+                  <th>Assigned Drops</th>
+                  <th>Completed</th>
+                  <th>Current Status</th>
+                  <th>Cash Collected</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="delivery_partners_body">
+                <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted);">Loading partners…</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /panel-delivery -->
+
+    </main>
+  </div><!-- /main-wrapper -->
+</div><!-- /layout -->
+
+<!-- Scripts -->
+<script src="js/app.js"></script>
+<script src="js/supabase-integration.js"></script>
+<script>
+  // ── TAB SWITCHING ──
+  function switchTab(tab) {
+    document.querySelectorAll('.page-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('tab-' + tab).classList.add('active');
+    document.getElementById('panel-' + tab).classList.add('active');
+  }
+
+  // ── SET TODAY'S DATE AS DEFAULT ──
+  document.addEventListener('DOMContentLoaded', () => {
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('filterDate').value = today;
+  });
+
+  // ── REFRESH BUTTON ──
+  async function refreshOrders() {
+    const btn = document.getElementById('refreshBtn');
+    btn.innerHTML = '<ion-icon name="sync-outline" style="animation:spin 1s linear infinite;"></ion-icon> Refreshing…';
+    btn.disabled = true;
+    try {
+      await fetchOrders();
+    } finally {
+      btn.innerHTML = '<ion-icon name="refresh-outline"></ion-icon> Refresh';
+      btn.disabled = false;
+    }
+  }
+</script>
+</body>
+</html>

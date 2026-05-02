@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice - Shreeji Milk Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      padding: 40px;
+      background: #f0f2f5;
+      color: #333;
+    }
+    .invoice-box {
+      max-width: 800px;
+      margin: auto;
+      padding: 40px 50px;
+      background: #fff;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border-top: 8px solid #14532D;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .logo-box {
+      background: #0F172A;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-box img {
+      max-height: 55px;
+    }
+    .brand-text h2 {
+      margin: 0;
+      font-size: 24px;
+      color: #14532D;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .brand-text p {
+      margin: 2px 0 0 0;
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+    }
+    .header-right {
+      text-align: right;
+    }
+    .title {
+      font-size: 32px;
+      color: #0F172A;
+      letter-spacing: 1px;
+      margin: 0 0 8px 0;
+      font-weight: 800;
+    }
+    .barcode-container {
+      text-align: right;
+    }
+    
+    .info-section {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 40px;
+      gap: 40px;
+    }
+    .info-col {
+      flex: 1;
+    }
+    .info-col h3 {
+      font-size: 12px;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0 0 10px 0;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+    }
+    .info-col p {
+      margin: 6px 0;
+      font-size: 14px;
+      color: #334155;
+    }
+    .info-col strong {
+      display: inline-block;
+      width: 130px;
+      color: #0F172A;
+      font-weight: 600;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 30px;
+    }
+    th, td {
+      padding: 14px 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 14px;
+    }
+    th {
+      background: #f8fafc;
+      font-weight: 600;
+      color: #475569;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+    .text-right {
+      text-align: right;
+    }
+    .text-center {
+      text-align: center;
+    }
+    .total-row td {
+      font-weight: 700;
+      font-size: 16px;
+      border-top: 2px solid #0F172A;
+      color: #0F172A;
+    }
+
+    .footer {
+      margin-top: 50px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      color: #64748b;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 24px;
+    }
+    .footer-left strong {
+      color: #0F172A;
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+    .footer-right {
+      text-align: right;
+    }
+    
+    @media print {
+      body {
+        background: #fff;
+        padding: 0;
+      }
+      .invoice-box {
+        box-shadow: none;
+        border: none;
+        border-top: 8px solid #14532D;
+        padding: 0;
+        max-width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="invoice-box">
+    <div class="header">
+      <div class="brand-section">
+        <div class="logo-box">
+          <img src="assets/logo-shree.png" alt="Shreeji Logo">
+        </div>
+        <div class="brand-text">
+          <h2>SHREEJI</h2>
+          <p>MILK CENTER</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <h1 class="title">INVOICE</h1>
+        <div class="barcode-container">
+          <svg id="barcode"></svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <div class="info-col">
+        <h3>Invoice Details</h3>
+        <p><strong>Invoice Number:</strong> <span id="inv-no">INV-1043</span></p>
+        <p><strong>Date of Issue:</strong> <span id="inv-date"></span></p>
+        <p><strong>Payment Terms:</strong> Due on Receipt</p>
+        <p><strong>Outstanding Dues:</strong> <span style="color: #dc2626; font-weight: 700;">₹ 450.00</span></p>
+      </div>
+      <div class="info-col">
+        <h3>Billed To</h3>
+        <p style="font-weight: 700; font-size: 16px; color: #0F172A; margin-bottom: 4px;" id="inv-vendor">Patel Provision</p>
+        <p>Shop No. 4, Main Market Road<br>
+        Zone B (Central), City<br>
+        Phone: +91 76543 21098</p>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 50%;">Item Description</th>
+          <th class="text-right">Unit Price</th>
+          <th class="text-center">Qty</th>
+          <th class="text-right">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div style="font-weight: 600; color: #0F172A;">Analog Cheez Paneer</div>
+            <div style="font-size: 12px; color: #64748b;">1kg Premium Pack</div>
+          </td>
+          <td class="text-right">₹ 240.00</td>
+          <td class="text-center">15</td>
+          <td class="text-right">₹ 3,600.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div style="font-weight: 600; color: #0F172A;">Shree Dahi Can</div>
+            <div style="font-size: 12px; color: #64748b;">5kg Commercial Tub</div>
+          </td>
+          <td class="text-right">₹ 350.00</td>
+          <td class="text-center">5</td>
+          <td class="text-right">₹ 1,750.00</td>
+        </tr>
+        <tr class="total-row">
+          <td colspan="3" class="text-right">Grand Total</td>
+          <td class="text-right">₹ 5,350.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      <div class="footer-left">
+        <strong>Payment Information</strong>
+        <p style="margin: 4px 0 0 0; color: #dc2626; font-weight: 600;">Payments are currently accepted in CASH only.</p>
+        <p style="margin: 4px 0 0 0;">Please hand over the amount to the delivery partner.</p>
+      </div>
+      <div class="footer-right">
+        <strong style="color:#0F172A; font-size: 14px; display: block; margin-bottom: 4px;">Thank you for your business!</strong>
+        For queries: support@shreejimilk.com<br>
+        +91 98765 00000
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Generate current date
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('inv-date').textContent = new Date().toLocaleDateString('en-IN', dateOptions);
+
+    // Read params from URL for dynamic rendering (if opened via button)
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('id') || 'ORD-1043';
+    const vendor = urlParams.get('vendor') || 'Patel Provision';
+    
+    document.getElementById('inv-no').textContent = orderId.replace('ORD', 'INV');
+    document.getElementById('inv-vendor').textContent = vendor;
+
+    // Generate Barcode using Store ID / Order ID
+    JsBarcode("#barcode", orderId, {
+      format: "CODE128",
+      lineColor: "#333",
+      width: 1.5,
+      height: 40,
+      displayValue: true,
+      fontSize: 14,
+      background: "transparent"
+    });
+
+    // Auto trigger print dialog after a slight delay to ensure barcode renders
+    setTimeout(() => {
+      window.print();
+    }, 500);
+  </script>
+
+</body>
+</html>
