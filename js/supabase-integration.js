@@ -190,7 +190,7 @@ async function fetchTransactions() {
 
     } catch (error) {
         console.error("Error fetching transactions:", error);
-        tableBody.innerHTML = \`<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading transactions.</td></tr>\`;
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading transactions.</td></tr>`;
     }
 }
 
