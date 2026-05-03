@@ -105,7 +105,7 @@
       <main class="content">
         <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
           Transactions & Reports
-          <button class="btn btn-success btn-sm" onclick="alert('Exporting transactions to Excel...')">
+          <button class="btn btn-success btn-sm" id="btn-export-transactions" onclick="window.exportTransactionsExcel && window.exportTransactionsExcel(window._allTransactions || [])">
             <ion-icon name="document-text-outline"></ion-icon> Export as Excel
           </button>
         </div>

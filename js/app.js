@@ -144,8 +144,11 @@ function renderVendorTable() {
       <td>${statusTag(v.status)}</td>
       <td>
         <div style="display:flex;align-items:center;gap:8px">
-          <button class="btn btn-sm btn-primary" onclick="alert('Collect Now: ${v.name}')">Collect Now</button>
-          <button class="btn-link" onclick="alert('View History: ${v.name}')">View History</button>
+          ${v.due > 0
+            ? `<button class="btn btn-sm btn-primary" onclick="collectNow('${v.name.replace(/'/g, "\\'")}',${ v.due })"><ion-icon name='cash-outline'></ion-icon> Collect</button>`
+            : `<button class="btn btn-sm btn-success" disabled style="cursor:default;"><ion-icon name='checkmark-circle-outline'></ion-icon> Paid</button>`
+          }
+          <button class="btn-link" onclick="viewHistory('${v.name.replace(/'/g, "\\'")}')" style="font-size:12px;color:var(--primary);">History</button>
         </div>
       </td>
     </tr>`).join('');
@@ -287,17 +290,215 @@ function initExpandPanels() {
 
 /* ── QUICK ACTIONS ── */
 function initQuickActions() {
-  const actions = [
-    { label:'Generate Bills', icon:'<ion-icon name="receipt-outline"></ion-icon>', style:'btn-primary' },
-    { label:'Export Excel', icon:'<ion-icon name="document-text-outline"></ion-icon>', style:'btn-success' },
-    { label:'Send Reminders', icon:'<ion-icon name="paper-plane-outline"></ion-icon>', style:'btn-outline' },
-    { label:'Add Product', icon:'<ion-icon name="add-circle-outline"></ion-icon>', style:'btn-outline' },
-    { label:'Record Payment', icon:'<ion-icon name="wallet-outline"></ion-icon>', style:'btn-outline' },
-  ];
   const bar = document.getElementById('quickActions');
   if (!bar) return;
-  bar.innerHTML = `<span class="quick-actions-label">Quick Actions:</span>` +
-    actions.map(a => `<button class="btn ${a.style}" onclick="alert('${a.label} — coming soon!')">${a.icon} ${a.label}</button>`).join('');
+  bar.innerHTML = `
+    <span class="quick-actions-label">Quick Actions:</span>
+    <button class="btn btn-primary" id="qa-bills" onclick="quickActionGenerateBills()">
+      <ion-icon name="receipt-outline"></ion-icon> Generate Bills
+    </button>
+    <button class="btn btn-success" id="qa-excel" onclick="quickActionExportExcel()">
+      <ion-icon name="document-text-outline"></ion-icon> Export Excel
+    </button>
+    <button class="btn btn-outline" id="qa-reminders" onclick="quickActionSendReminders()">
+      <ion-icon name="paper-plane-outline"></ion-icon> Send Reminders
+    </button>
+    <button class="btn btn-outline" id="qa-product" onclick="quickActionAddProduct()">
+      <ion-icon name="add-circle-outline"></ion-icon> Add Product
+    </button>
+    <button class="btn btn-outline" id="qa-payment" onclick="quickActionRecordPayment()">
+      <ion-icon name="wallet-outline"></ion-icon> Record Payment
+    </button>
+  `;
+}
+
+/* ── QUICK ACTION HANDLERS ── */
+window.quickActionGenerateBills = function() {
+  window.open('invoice.html', '_blank');
+};
+
+window.quickActionExportExcel = function() {
+  exportTableToExcel('dashboard');
+};
+
+window.quickActionSendReminders = function() {
+  const overdue = DATA.vendors.filter(v => v.status === 'Overdue' || v.status === 'Partial');
+  if (!overdue.length) {
+    showToast('✅ No pending reminders — all vendors are paid up!', 'success');
+    return;
+  }
+  const list = overdue.map(v =>
+    `<li style="padding:6px 0;border-bottom:1px solid var(--border);">
+      <strong>${v.name}</strong> — <span style="color:${v.status==='Overdue'?'var(--danger)':'var(--warning)'}">${v.status}</span>
+      ${v.due > 0 ? ` &nbsp;·&nbsp; <strong>₹${v.due.toLocaleString('en-IN')}</strong> due` : ''}
+    </li>`
+  ).join('');
+  showModal(
+    '<ion-icon name="paper-plane-outline"></ion-icon> Send Payment Reminders',
+    `<p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">${overdue.length} vendor(s) have outstanding dues:</p>
+    <ul style="list-style:none;padding:0;margin:0 0 16px;">${list}</ul>
+    <p style="font-size:12px;color:var(--text-muted);"><ion-icon name="information-circle-outline"></ion-icon> In a production system this would send WhatsApp/SMS messages to vendors.</p>`,
+    [{ label: 'Send All Reminders', cls: 'btn-primary', action: () => { showToast(`✅ ${overdue.length} reminder(s) queued for delivery!`, 'success'); closeModal(); } },
+     { label: 'Cancel', cls: 'btn-outline', action: closeModal }]
+  );
+};
+
+window.quickActionAddProduct = function() {
+  window.location.href = 'settings.html#products';
+};
+
+window.quickActionRecordPayment = function() {
+  window.location.href = 'transactions.html';
+};
+
+/* ── COLLECT NOW / VIEW HISTORY (vendor table) ── */
+window.collectNow = function(vendorName, vendorDue) {
+  showModal(
+    '<ion-icon name="cash-outline"></ion-icon> Collect Payment — ' + vendorName,
+    `<div style="margin-bottom:16px;">
+      <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px;">Outstanding Due</div>
+      <div style="font-size:28px;font-weight:800;color:var(--danger);">₹${parseInt(vendorDue).toLocaleString('en-IN')}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Amount Collected (₹)</label>
+      <input type="number" id="modal_collect_amount" class="form-control" placeholder="Enter amount" value="${vendorDue}" />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Payment Mode</label>
+      <select id="modal_collect_mode" class="form-control">
+        <option value="cash">Cash</option>
+        <option value="upi">UPI</option>
+        <option value="bank_transfer">Bank Transfer</option>
+      </select>
+    </div>`,
+    [{ label: '<ion-icon name="checkmark-outline"></ion-icon> Record Collection', cls: 'btn-primary', action: () => {
+        const amt = document.getElementById('modal_collect_amount')?.value;
+        if (!amt || isNaN(amt) || parseFloat(amt) <= 0) { showToast('❌ Please enter a valid amount.', 'error'); return; }
+        showToast(`✅ ₹${parseFloat(amt).toLocaleString('en-IN')} collected from ${vendorName}`, 'success');
+        closeModal();
+        window.location.href = 'transactions.html';
+      }
+    },
+    { label: 'Cancel', cls: 'btn-outline', action: closeModal }]
+  );
+};
+
+window.viewHistory = function(vendorName) {
+  window.location.href = 'transactions.html';
+};
+
+/* ── MODAL SYSTEM ── */
+function showModal(title, body, buttons) {
+  let modal = document.getElementById('_globalModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = '_globalModal';
+    modal.style.cssText = 'position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);';
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+    document.body.appendChild(modal);
+  }
+  const btnsHTML = (buttons || []).map(b =>
+    `<button class="btn ${b.cls}" id="_mbtn_${Math.random().toString(36).slice(2)}">${b.label}</button>`
+  ).join('');
+  modal.innerHTML = `
+    <div style="background:var(--bg-card,#fff);border-radius:16px;padding:28px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:8px;">${title}</div>
+      <div style="font-size:14px;color:var(--text-secondary);line-height:1.6;">${body}</div>
+      <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;" id="_modalBtnRow"></div>
+    </div>`;
+  const btnRow = document.getElementById('_modalBtnRow');
+  (buttons || []).forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'btn ' + b.cls;
+    btn.innerHTML = b.label;
+    btn.addEventListener('click', b.action);
+    btnRow.appendChild(btn);
+  });
+  modal.style.display = 'flex';
+}
+
+window.closeModal = function() {
+  const modal = document.getElementById('_globalModal');
+  if (modal) modal.style.display = 'none';
+};
+
+/* ── TOAST NOTIFICATION ── */
+function showToast(message, type) {
+  let container = document.getElementById('_toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = '_toastContainer';
+    container.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:10px;';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  const colors = { success: '#16a34a', error: '#dc2626', info: '#1677ff' };
+  toast.style.cssText = `background:${colors[type]||colors.info};color:white;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,0.2);animation:slideInRight .3s ease;max-width:320px;`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s'; setTimeout(() => toast.remove(), 300); }, 3500);
+}
+
+window.showToast = showToast;
+
+/* ── EXCEL EXPORT ── */
+function exportTableToExcel(context) {
+  const rows = [];
+  if (context === 'dashboard') {
+    rows.push(['Vendor Name', 'Zone', 'This Month Orders', 'Amount Due (₹)', 'Last Payment', 'Status']);
+    DATA.vendors.forEach(v => {
+      rows.push([v.name, v.zone, v.orders, v.due, v.lastPay, v.status]);
+    });
+    downloadCSVAsExcel(rows, 'ShreejiMilk_Vendors_' + new Date().toISOString().slice(0,10));
+  }
+}
+
+window.exportTransactionsExcel = function(transactions) {
+  if (!transactions || !transactions.length) { showToast('No transactions to export.', 'info'); return; }
+  const rows = [['Date', 'Transaction ID', 'Vendor', 'Amount (₹)', 'Payment Mode', 'Status']];
+  transactions.forEach(t => {
+    const date = new Date(t.created_at).toLocaleDateString('en-GB');
+    const txnId = t.transaction_ref || (t.id ? t.id.substring(0, 8).toUpperCase() : 'N/A');
+    const entity = t.vendor_name || t.delivery_partner_name || '—';
+    const amount = parseFloat(t.amount || 0).toFixed(2);
+    rows.push([date, txnId, entity, amount, t.payment_mode || 'Unknown', 'Completed']);
+  });
+  downloadCSVAsExcel(rows, 'ShreejiMilk_Transactions_' + new Date().toISOString().slice(0,10));
+};
+
+window.exportOrdersExcel = function(orders) {
+  if (!orders || !orders.length) { showToast('No orders to export.', 'info'); return; }
+  const rows = [['Order ID', 'Vendor', 'Zone', 'Phone', 'Items Summary', 'Amount (₹)', 'Status', 'Date']];
+  orders.forEach(o => {
+    const shortId = '#' + (o.id || '').substring(0, 8).toUpperCase();
+    const amount = parseFloat(o.total_amount || 0).toFixed(2);
+    rows.push([shortId, o.vendor_name || '—', o.vendor_zone || '—', o.phone_number || '—', o.items_summary || '—', amount, o.status || '—', o.order_date || '—']);
+  });
+  downloadCSVAsExcel(rows, 'ShreejiMilk_Orders_' + new Date().toISOString().slice(0,10));
+};
+
+function downloadCSVAsExcel(rows, filename) {
+  // Build CSV content
+  const csv = rows.map(row =>
+    row.map(cell => {
+      const val = String(cell ?? '');
+      // Quote cells that contain commas, quotes, or newlines
+      if (val.includes(',') || val.includes('"') || val.includes('\n')) {
+        return '"' + val.replace(/"/g, '""') + '"';
+      }
+      return val;
+    }).join(',')
+  ).join('\n');
+
+  // Add BOM for Excel UTF-8 recognition
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Export downloaded: ' + filename + '.csv', 'success');
 }
 
 /* ── INIT ── */

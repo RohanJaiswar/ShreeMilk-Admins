@@ -33,7 +33,7 @@ async function fetchDirectory() {
         if (pError) throw pError;
 
         if ((!vendors || vendors.length === 0) && (!partners || partners.length === 0)) {
-            tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No vendors or delivery partners added till now.</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">No vendors or delivery partners added till now.</td></tr>';
             
             // Update counts to 0
             const cv = document.getElementById('count_vendors');
@@ -50,14 +50,26 @@ async function fetchDirectory() {
         const cv = document.getElementById('count_vendors');
         if (cv) cv.innerText = vendors ? vendors.length : "0";
 
+        // Populate container vendor select if present
+        const cVendorSelect = document.getElementById('c_vendor_select');
+        if (cVendorSelect && vendors) {
+            cVendorSelect.innerHTML = '<option value="">-- Select a Vendor --</option>' + 
+                vendors.map(v => `<option value="${v.id}" data-containers="${v.containers_balance || 0}">${v.store_name || v.username} (${v.containers_balance || 0} containers)</option>`).join('');
+        }
+
         if (vendors) {
             vendors.forEach(v => {
+                const bal = v.containers_balance || 0;
+                let balTag = 'tag-success';
+                if (bal >= 5) balTag = 'tag-danger';
+                else if (bal >= 3) balTag = 'tag-warning';
                 rowsHTML += `
                 <tr>
                   <td><span class="tag tag-info"><ion-icon name="storefront-outline"></ion-icon> Vendor</span></td>
                   <td style="font-weight: 500;">${v.store_name}</td>
                   <td>${v.zone}</td>
                   <td>${v.phone_number}</td>
+                  <td><span class="tag ${balTag}" style="font-weight:600;"><ion-icon name="cube-outline"></ion-icon> ${bal}</span></td>
                   <td><span class="tag tag-success">Active</span></td>
                   <td><button class="btn btn-ghost btn-sm">View</button></td>
                 </tr>`;
@@ -76,6 +88,7 @@ async function fetchDirectory() {
                   <td style="font-weight: 500;">${p.full_name}</td>
                   <td>${p.assigned_zone}</td>
                   <td>${p.phone_number}</td>
+                  <td style="color: var(--text-muted);">—</td>
                   <td style="font-family: monospace; color: var(--text-secondary);">${p.vehicle_number}</td>
                   <td><button class="btn btn-ghost btn-sm">View</button></td>
                 </tr>`;
@@ -86,7 +99,7 @@ async function fetchDirectory() {
 
     } catch (error) {
         console.error("Error fetching directory:", error);
-        tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading directory.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--danger);">Error loading directory.</td></tr>`;
     }
 }
 
@@ -159,6 +172,7 @@ async function fetchTransactions() {
         if (error) throw error;
 
         _allTransactions = transactions || [];
+        window._allTransactions = _allTransactions; // expose for export button
         
         // Setup filter listeners
         document.getElementById('dateFilter')?.addEventListener('change', applyTransactionFilters);
@@ -352,6 +366,7 @@ async function fetchOrders() {
         if (error) throw error;
 
         _allOrders = orders || [];
+        window._allOrders = _allOrders; // expose for export button
 
         // Populate zone filter
         _populateZoneFilter(_allOrders);
@@ -775,6 +790,106 @@ function initSupabaseForms() {
     fetchProducts();
     fetchTransactions();
     fetchDashboardData();
+
+    /* ----------------------------------------------------------------------
+     * CONTAINER MANAGEMENT LOGIC
+     * ---------------------------------------------------------------------- */
+    const cVendorSelect = document.getElementById('c_vendor_select');
+    const cBalanceDisplay = document.getElementById('c_balance_display');
+
+    if (cVendorSelect) {
+        cVendorSelect.addEventListener('change', async () => {
+            const vendorId = cVendorSelect.value;
+            const issuedInput = document.getElementById('c_issued');
+            const returnedInput = document.getElementById('c_returned');
+            if (issuedInput) issuedInput.value = '';
+            if (returnedInput) returnedInput.value = '';
+
+            if (!vendorId) {
+                if (cBalanceDisplay) cBalanceDisplay.textContent = '0';
+                return;
+            }
+
+            // Fetch latest balance for selected vendor
+            try {
+                const { data, error } = await supabaseClient
+                    .from('vendors')
+                    .select('containers_balance')
+                    .eq('id', vendorId)
+                    .single();
+
+                if (error) throw error;
+                if (cBalanceDisplay) cBalanceDisplay.textContent = data.containers_balance || 0;
+            } catch (err) {
+                console.error('Error fetching container balance:', err);
+                if (cBalanceDisplay) cBalanceDisplay.textContent = '?';
+            }
+        });
+    }
+
+    const btnUpdateContainers = document.getElementById('btn_update_containers');
+    if (btnUpdateContainers) {
+        btnUpdateContainers.addEventListener('click', async () => {
+            const vendorId = document.getElementById('c_vendor_select')?.value;
+            const issued = parseInt(document.getElementById('c_issued')?.value || '0', 10);
+            const returned = parseInt(document.getElementById('c_returned')?.value || '0', 10);
+
+            if (!vendorId) {
+                alert('Please select a vendor first.');
+                return;
+            }
+            if (issued === 0 && returned === 0) {
+                alert('Enter at least one value — containers issued or returned.');
+                return;
+            }
+
+            btnUpdateContainers.disabled = true;
+            btnUpdateContainers.innerHTML = '<ion-icon name="hourglass-outline"></ion-icon> Saving…';
+
+            try {
+                // Get current balance
+                const { data: vendor, error: fetchErr } = await supabaseClient
+                    .from('vendors')
+                    .select('containers_balance, store_name')
+                    .eq('id', vendorId)
+                    .single();
+
+                if (fetchErr) throw fetchErr;
+
+                const currentBalance = vendor.containers_balance || 0;
+                const newBalance = currentBalance + issued - returned;
+
+                // Update in Supabase
+                const { error: updateErr } = await supabaseClient
+                    .from('vendors')
+                    .update({ containers_balance: newBalance })
+                    .eq('id', vendorId);
+
+                if (updateErr) throw updateErr;
+
+                // Update UI
+                if (cBalanceDisplay) cBalanceDisplay.textContent = newBalance;
+
+                // Clear inputs
+                const issuedInput = document.getElementById('c_issued');
+                const returnedInput = document.getElementById('c_returned');
+                if (issuedInput) issuedInput.value = '';
+                if (returnedInput) returnedInput.value = '';
+
+                alert(`✅ Updated ${vendor.store_name}:\n  Issued: +${issued}, Returned: -${returned}\n  New balance: ${newBalance} containers`);
+
+                // Refresh the directory table to show updated counts
+                fetchDirectory();
+
+            } catch (err) {
+                console.error('Error updating containers:', err);
+                alert('❌ Failed to update containers: ' + (err.message || 'Check console.'));
+            } finally {
+                btnUpdateContainers.disabled = false;
+                btnUpdateContainers.innerHTML = '<ion-icon name="save-outline"></ion-icon> Log Container Transaction';
+            }
+        });
+    }
 
     /* ----------------------------------------------------------------------
      * ADD NEW VENDOR LOGIC

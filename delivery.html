@@ -337,6 +337,9 @@
             <button class="btn btn-outline btn-sm" onclick="refreshOrders()" id="refreshBtn">
               <ion-icon name="refresh-outline"></ion-icon> Refresh
             </button>
+            <button class="btn btn-success btn-sm" id="btn-export-orders" onclick="window.exportOrdersExcel && window.exportOrdersExcel(window._allOrders || [])">
+              <ion-icon name="document-text-outline"></ion-icon> Export Excel
+            </button>
             <button class="btn btn-primary btn-sm" onclick="window.open('invoice.html?bulk=true', '_blank')">
               <ion-icon name="print-outline"></ion-icon> Bulk Print
             </button>

@@ -557,3 +557,9 @@ tbody tr:last-child td { border-bottom: none; }
 @media (max-width: 480px) {
   .kpi-grid { grid-template-columns: 1fr; }
 }
+
+/* ===== TOAST ANIMATION ===== */
+@keyframes slideInRight {
+  from { transform: translateX(110%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
