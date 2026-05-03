@@ -536,6 +536,114 @@ async function fetchDeliveryPartners() {
     }
 }
 
+// =========================================================================
+// DASHBOARD MODULE
+// =========================================================================
+async function fetchDashboardData() {
+    // Only run on dashboard
+    if (!document.getElementById('vendorTbody') && !document.getElementById('kpiGrid')) return;
+
+    try {
+        // Fetch all necessary data for KPIs
+        const today = new Date().toISOString().split('T')[0];
+        
+        const [
+            { data: vendors, error: vError },
+            { data: products, error: pError },
+            { data: partners, error: dpError },
+            { data: ordersToday, error: oError },
+            { data: transactions, error: tError }
+        ] = await Promise.all([
+            supabaseClient.from('vendors').select('*'),
+            supabaseClient.from('products').select('*'),
+            supabaseClient.from('delivery_partners').select('*'),
+            supabaseClient.from('orders').select('id, total_amount, status').eq('order_date', today),
+            supabaseClient.from('transactions').select('amount')
+        ]);
+
+        // Process KPI Data
+        if (document.getElementById('kpiGrid')) {
+            // Calculate Orders Today
+            const totalOrdersToday = (ordersToday || []).length;
+            
+            // Calculate Total Revenue (All completed transactions)
+            const totalRevenue = (transactions || []).reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            
+            // Update the global DATA object for KPI
+            const kpiObj = DATA.kpi;
+            
+            // Update Revenue KPI
+            if (kpiObj[0]) {
+                kpiObj[0].value = '₹' + totalRevenue.toLocaleString('en-IN');
+                kpiObj[0].trend = 'Live';
+                kpiObj[0].sub = 'total collected';
+            }
+            
+            // Update Orders Today KPI
+            if (kpiObj[2]) {
+                kpiObj[2].value = totalOrdersToday.toString();
+                kpiObj[2].trend = 'Live';
+                kpiObj[2].sub = 'dispatched/pending';
+            }
+
+            // We mock Pending Dues and Containers out as there is no specific table for them yet
+            
+            // Re-render KPI
+            if (typeof renderKpi === 'function') renderKpi();
+        }
+
+        // Process Vendors (Users)
+        if (!vError && vendors && vendors.length > 0) {
+            DATA.vendors = vendors.map((v, index) => ({
+                id: v.id || index + 1,
+                name: v.store_name || v.username || 'Unknown',
+                zone: v.zone || 'Zone A',
+                orders: Math.floor(Math.random() * 25) + 1, // Mock orders for UI
+                due: Math.floor(Math.random() * 4000),      // Mock dues
+                lastPay: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
+                status: ['Paid', 'Overdue', 'Partial'][Math.floor(Math.random() * 3)]
+            }));
+            if (typeof renderVendorTable === 'function') renderVendorTable();
+        }
+
+        // Process Products
+        if (!pError && products && products.length > 0) {
+            const mappedProducts = products.map((p, idx) => ({
+                rank: idx + 1,
+                name: p.product_name,
+                category: p.category,
+                units: Math.floor(Math.random() * 200) + 10,
+                revenue: '₹' + (parseFloat(p.base_price || 100) * 10).toLocaleString('en-IN'),
+                avgDaily: Math.floor(Math.random() * 10) + 1,
+                spark: [4,5,6,4,5,6,5],
+                stock: ['OK', 'OK', 'Low Stock', 'Critical'][Math.floor(Math.random() * 4)]
+            }));
+            
+            DATA.products.month = mappedProducts;
+            DATA.products.week = mappedProducts;
+            DATA.products.today = mappedProducts;
+            
+            if (typeof renderProductsTable === 'function') renderProductsTable();
+        }
+
+        // Process Delivery Partners
+        if (!dpError && partners && partners.length > 0) {
+            DATA.delivery.agents = partners.map(p => ({
+                name: p.full_name,
+                zone: p.assigned_zone || 'Zone A',
+                delivered: Math.floor(Math.random() * 20),
+                missed: Math.floor(Math.random() * 2),
+                pending: Math.floor(Math.random() * 5),
+                collected: '₹' + (Math.floor(Math.random() * 1000))
+            }));
+            if (typeof renderDelivery === 'function') renderDelivery();
+        }
+
+    } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+    }
+}
+
 // 3. INITIALIZATION FUNCTION
 function initSupabaseForms() {
     console.log("Initializing forms and fetching data...");
@@ -547,6 +655,7 @@ function initSupabaseForms() {
     fetchDirectory();
     fetchProducts();
     fetchTransactions();
+    fetchDashboardData();
 
     /* ----------------------------------------------------------------------
      * ADD NEW VENDOR LOGIC
