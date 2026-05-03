@@ -69,11 +69,10 @@ body {
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 .sider-logo img {
-  width: 240px;
-  max-width: 100%;
+  width: 200px;
+  max-width: 90%;
   max-height: 150px;
   object-fit: contain;
-  transform: scale(1.4);
   transition: var(--transition);
 }
 .sider-logo-text {

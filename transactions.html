@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shreeji Milk Center — Transactions and Reports</title>
-  <meta name="description" content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
+  <meta name="description"
+    content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,130 +15,144 @@
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
+
 <body>
 
-<div class="overlay" id="overlay"></div>
+  <div class="overlay" id="overlay"></div>
 
-<div class="layout">
+  <div class="layout">
 
-  <!-- ═══════════════ SIDER ═══════════════ -->
-  <aside class="sider" id="sider">
-    <div class="sider-logo">
-      <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
-      <div class="sider-logo-text">Milk Center</div>
-    </div>
-    <nav class="nav-menu">
-      <a href="index.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span class="nav-label">Dashboard</span>
-      </a>
-      <a href="delivery.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery & Orders</span>
-      </a>
-      <a href="vendors.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors & Logistics</span>
-      </a>
-      <a href="transactions.html" class="nav-item active" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions and Reports</span>
-      </a>
-      <a href="settings.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span class="nav-label">Settings</span>
-      </a>
-    </nav>
-  </aside>
+    <!-- ═══════════════ SIDER ═══════════════ -->
+    <aside class="sider" id="sider">
+      <div class="sider-logo">
+        <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
 
-  <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
-  <div class="main-wrapper" id="mainWrapper">
-
-    <!-- ── HEADER ── -->
-    <header class="header">
-      <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon name="menu-outline"></ion-icon></button>
-      <div class="header-breadcrumb">
-        Dashboard &rsaquo; <span>Transactions and Reports</span>
       </div>
-      <div class="header-right">
-        <!-- Brand Logo in Top Right -->
-        <div class="header-logo" style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
-          <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
-        </div>
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span
+            class="nav-label">Dashboard</span>
+        </a>
+        <a href="delivery.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery &
+            Orders</span>
+        </a>
+        <a href="vendors.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors &
+            Logistics</span>
+        </a>
+        <a href="transactions.html" class="nav-item active" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
+            and Reports</span>
+        </a>
+        <a href="settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
+            class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </aside>
 
-        <span class="header-date" id="headerDate"></span>
-        <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
-          <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
-        </button>
-        <div class="user-info" onclick="toggleProfileMenu(event)">
-          <div class="user-avatar">RS</div>
-          <div style="display:flex;flex-direction:column;justify-content:center;">
-            <span class="user-name">Rahul Sharma</span>
-            <span class="user-role">Administrator</span>
+    <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+    <div class="main-wrapper" id="mainWrapper">
+
+      <!-- ── HEADER ── -->
+      <header class="header">
+        <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon
+            name="menu-outline"></ion-icon></button>
+        <div class="header-breadcrumb">
+          Dashboard &rsaquo; <span>Transactions and Reports</span>
+        </div>
+        <div class="header-right">
+          <!-- Brand Logo in Top Right -->
+          <div class="header-logo"
+            style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+            <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
           </div>
-          <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
-          
-          <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
-            <div class="profile-header">
-              <div class="profile-avatar-small">RS</div>
-              <div class="profile-details">
-                <span class="profile-name">Rahul Sharma</span>
-                <span class="profile-email">rahul@shreejimilk.com</span>
+
+          <span class="header-date" id="headerDate"></span>
+          <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+            <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+          </button>
+          <div class="user-info" onclick="toggleProfileMenu(event)">
+            <div class="user-avatar">RS</div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+              <span class="user-name">Rahul Sharma</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
+
+            <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+              <div class="profile-header">
+                <div class="profile-avatar-small">RS</div>
+                <div class="profile-details">
+                  <span class="profile-name">Rahul Sharma</span>
+                  <span class="profile-email">rahul@shreejimilk.com</span>
+                </div>
+              </div>
+              <div class="profile-menu">
+                <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+                <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+              </div>
+              <div class="profile-logout">
+                <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
               </div>
             </div>
-            <div class="profile-menu">
-              <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
-              <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
-            </div>
-            <div class="profile-logout">
-              <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
-            </div>
           </div>
         </div>
-      </div>
-    </header>
+      </header>
 
-    <!-- ═══════════════ CONTENT ═══════════════ -->
-    <main class="content">
-      <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
-        Transactions & Reports
-        <button class="btn btn-success btn-sm" onclick="alert('Exporting transactions to Excel...')">
-          <ion-icon name="document-text-outline"></ion-icon> Export as Excel
-        </button>
-      </div>
+      <!-- ═══════════════ CONTENT ═══════════════ -->
+      <main class="content">
+        <div class="section-title" style="display: flex; justify-content: space-between; align-items: center;">
+          Transactions & Reports
+          <button class="btn btn-success btn-sm" onclick="alert('Exporting transactions to Excel...')">
+            <ion-icon name="document-text-outline"></ion-icon> Export as Excel
+          </button>
+        </div>
 
-      <div class="card">
-        <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
-          <div class="card-title"><ion-icon name="cash-outline"></ion-icon> Recent Transactions</div>
-          <div class="card-actions" style="display:flex; gap: 12px; align-items: center; flex: 1; max-width: 450px; margin-left: auto;">
-            <input type="date" class="form-control" style="padding: 8px 12px; font-size: 13px; max-width: 150px;" />
-            <div class="input-with-icon" style="flex: 1;">
-              <ion-icon name="search-outline"></ion-icon>
-              <input type="text" class="form-control" placeholder="Search by ID or Vendor..." style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+        <div class="card">
+          <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
+            <div class="card-title"><ion-icon name="cash-outline"></ion-icon> Recent Transactions</div>
+            <div class="card-actions"
+              style="display:flex; gap: 12px; align-items: center; flex: 1; max-width: 450px; margin-left: auto;">
+              <input type="date" class="form-control" style="padding: 8px 12px; font-size: 13px; max-width: 150px;" />
+              <div class="input-with-icon" style="flex: 1;">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" class="form-control" placeholder="Search by ID or Vendor..."
+                  style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+              </div>
             </div>
           </div>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Transaction ID</th>
+                  <th>Vendor</th>
+                  <th>Amount</th>
+                  <th>Payment Method</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="transactions_table_body">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading
+                    transactions...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-        <div class="card-body" style="padding: 0; overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Transaction ID</th>
-                <th>Vendor</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="transactions_table_body">
-              <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading transactions...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
 
-    </main><!-- /content -->
-  </div><!-- /main-wrapper -->
-</div><!-- /layout -->
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-integration.js"></script>
-<script src="js/app.js"></script>
+      </main><!-- /content -->
+    </div><!-- /main-wrapper -->
+  </div><!-- /layout -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-integration.js"></script>
+  <script src="js/app.js"></script>
 
 </body>
+
 </html>

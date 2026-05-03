@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shreeji Milk Center — Vendors & Logistics</title>
-  <meta name="description" content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
+  <meta name="description"
+    content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -13,280 +15,307 @@
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 </head>
+
 <body>
 
-<div class="overlay" id="overlay"></div>
+  <div class="overlay" id="overlay"></div>
 
-<div class="layout">
+  <div class="layout">
 
-  <!-- ═══════════════ SIDER ═══════════════ -->
-  <aside class="sider" id="sider">
-    <div class="sider-logo">
-      <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
-      <div class="sider-logo-text">Milk Center</div>
-    </div>
-    <nav class="nav-menu">
-      <a href="index.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span class="nav-label">Dashboard</span>
-      </a>
-      <a href="delivery.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery & Orders</span>
-      </a>
-      <a href="vendors.html" class="nav-item active" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors & Logistics</span>
-      </a>
-      <a href="transactions.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions and Reports</span>
-      </a>
-      <a href="settings.html" class="nav-item" style="text-decoration: none;">
-        <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span class="nav-label">Settings</span>
-      </a>
-    </nav>
-  </aside>
+    <!-- ═══════════════ SIDER ═══════════════ -->
+    <aside class="sider" id="sider">
+      <div class="sider-logo">
+        <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
 
-  <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
-  <div class="main-wrapper" id="mainWrapper">
-
-    <!-- ── HEADER ── -->
-    <header class="header">
-      <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon name="menu-outline"></ion-icon></button>
-      <div class="header-breadcrumb">
-        Dashboard &rsaquo; <span>Vendors & Logistics</span>
       </div>
-      <div class="header-right">
-        <!-- Brand Logo in Top Right -->
-        <div class="header-logo" style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
-          <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
-        </div>
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span
+            class="nav-label">Dashboard</span>
+        </a>
+        <a href="delivery.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery &
+            Orders</span>
+        </a>
+        <a href="vendors.html" class="nav-item active" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors &
+            Logistics</span>
+        </a>
+        <a href="transactions.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
+            and Reports</span>
+        </a>
+        <a href="settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
+            class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </aside>
 
-        <span class="header-date" id="headerDate"></span>
-        <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
-          <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
-        </button>
-        <div class="user-info" onclick="toggleProfileMenu(event)">
-          <div class="user-avatar">RS</div>
-          <div style="display:flex;flex-direction:column;justify-content:center;">
-            <span class="user-name">Rahul Sharma</span>
-            <span class="user-role">Administrator</span>
-          </div>
-          <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
-          
-          <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
-            <div class="profile-header">
-              <div class="profile-avatar-small">RS</div>
-              <div class="profile-details">
-                <span class="profile-name">Rahul Sharma</span>
-                <span class="profile-email">rahul@shreejimilk.com</span>
-              </div>
-            </div>
-            <div class="profile-menu">
-              <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
-              <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
-            </div>
-            <div class="profile-logout">
-              <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </header>
+    <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+    <div class="main-wrapper" id="mainWrapper">
 
-    <!-- ═══════════════ CONTENT ═══════════════ -->
-    <main class="content">
-      <div class="section-title">Vendors & Logistics</div>
-      
-      <!-- STATS GRID -->
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 24px;">
-        <div class="card" style="display: flex; align-items: center; padding: 20px; gap: 16px;">
-          <div style="width: 56px; height: 56px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px;">
-            <ion-icon name="storefront-outline"></ion-icon>
-          </div>
-          <div>
-            <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Total Vendors</div>
-            <div id="count_vendors" style="font-size: 28px; font-weight: 700; color: var(--text-primary);">0</div>
-          </div>
+      <!-- ── HEADER ── -->
+      <header class="header">
+        <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon
+            name="menu-outline"></ion-icon></button>
+        <div class="header-breadcrumb">
+          Dashboard &rsaquo; <span>Vendors & Logistics</span>
         </div>
-        <div class="card" style="display: flex; align-items: center; padding: 20px; gap: 16px;">
-          <div style="width: 56px; height: 56px; border-radius: 12px; background: rgba(168, 85, 247, 0.1); color: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 28px;">
-            <ion-icon name="bicycle-outline"></ion-icon>
+        <div class="header-right">
+          <!-- Brand Logo in Top Right -->
+          <div class="header-logo"
+            style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+            <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
           </div>
-          <div>
-            <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Delivery Partners</div>
-            <div id="count_partners" style="font-size: 28px; font-weight: 700; color: var(--text-primary);">0</div>
-          </div>
-        </div>
-      </div>
 
-      <!-- Lookup Search & Directory (MOVED TO TOP) -->
-      <div class="card" style="margin-bottom: 24px;">
-        <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
-          <div class="card-title"><ion-icon name="search-outline"></ion-icon> Directory Lookup</div>
-          <div class="card-actions" style="display:flex; gap: 12px; align-items: center; flex: 1; max-width: 450px; margin-left: auto;">
-            <div class="input-with-icon" style="flex: 1;">
-              <ion-icon name="search-outline"></ion-icon>
-              <input type="text" class="form-control" placeholder="Search by name, ID, or vehicle..." style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+          <span class="header-date" id="headerDate"></span>
+          <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+            <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+          </button>
+          <div class="user-info" onclick="toggleProfileMenu(event)">
+            <div class="user-avatar">RS</div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+              <span class="user-name">Rahul Sharma</span>
+              <span class="user-role">Administrator</span>
             </div>
-            <button class="btn btn-primary" style="padding: 10px 16px;">Search</button>
-          </div>
-        </div>
-        <div class="card-body" style="padding: 0; overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Type</th>
-                <th>Name / Store</th>
-                <th>Zone</th>
-                <th>Contact</th>
-                <th>Vehicle / Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="directory_table_body">
-              <tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading directory data...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+            <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
 
-      <!-- FORMS (MOVED TO BOTTOM) -->
-      <div class="section-title" style="margin-top: 32px; font-size: 18px;">Onboarding</div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px;">
-        <!-- Add Vendor Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><ion-icon name="storefront-outline"></ion-icon> Add New Vendor</div>
-          </div>
-          <div class="card-body" style="padding: 24px;">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Register a new retail shop to supply dairy products.</p>
-            <div class="form-group">
-              <label class="form-label">Store Name</label>
-              <div class="input-with-icon">
-                <ion-icon name="business-outline"></ion-icon>
-                <input type="text" id="v_store_name" class="form-control" placeholder="e.g. Ramesh Dairy" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Phone Number</label>
-                <div class="input-with-icon">
-                  <ion-icon name="call-outline"></ion-icon>
-                  <input type="tel" id="v_phone" class="form-control" placeholder="+91" />
+            <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+              <div class="profile-header">
+                <div class="profile-avatar-small">RS</div>
+                <div class="profile-details">
+                  <span class="profile-name">Rahul Sharma</span>
+                  <span class="profile-email">rahul@shreejimilk.com</span>
                 </div>
               </div>
-              <div class="form-group">
-                <label class="form-label">Zone</label>
-                <div class="input-with-icon">
-                  <ion-icon name="map-outline"></ion-icon>
-                  <select id="v_zone" class="form-control">
-                    <option>Zone A (North)</option>
-                    <option>Zone B (Central)</option>
-                    <option>Zone C (South)</option>
-                  </select>
-                </div>
+              <div class="profile-menu">
+                <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+                <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+              </div>
+              <div class="profile-logout">
+                <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
               </div>
             </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Username</label>
-                <div class="input-with-icon">
-                  <ion-icon name="at-outline"></ion-icon>
-                  <input type="text" id="v_username" class="form-control" placeholder="vendor_username" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-with-icon">
-                  <ion-icon name="lock-closed-outline"></ion-icon>
-                  <input type="password" id="v_password" class="form-control" placeholder="••••••••" />
-                </div>
-              </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ═══════════════ CONTENT ═══════════════ -->
+      <main class="content">
+        <div class="section-title">Vendors & Logistics</div>
+
+        <!-- STATS GRID -->
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 24px;">
+          <div class="card" style="display: flex; align-items: center; padding: 20px; gap: 16px;">
+            <div
+              style="width: 56px; height: 56px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 28px;">
+              <ion-icon name="storefront-outline"></ion-icon>
             </div>
-            <div class="form-group">
-              <label class="form-label">Address</label>
-              <div class="input-with-icon" style="align-items: flex-start;">
-                <ion-icon name="location-outline" style="top: 12px;"></ion-icon>
-                <textarea id="v_address" class="form-control" rows="3" placeholder="Full store address..."></textarea>
-              </div>
+            <div>
+              <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Total Vendors</div>
+              <div id="count_vendors" style="font-size: 28px; font-weight: 700; color: var(--text-primary);">0</div>
             </div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;">
-              <ion-icon name="information-circle-outline"></ion-icon> Credentials will be saved to Supabase securely.
+          </div>
+          <div class="card" style="display: flex; align-items: center; padding: 20px; gap: 16px;">
+            <div
+              style="width: 56px; height: 56px; border-radius: 12px; background: rgba(168, 85, 247, 0.1); color: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 28px;">
+              <ion-icon name="bicycle-outline"></ion-icon>
             </div>
-            <button id="btn_add_vendor" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;"><ion-icon name="add-circle-outline"></ion-icon> Register Vendor</button>
+            <div>
+              <div style="font-size: 14px; color: var(--text-muted); font-weight: 500;">Delivery Partners</div>
+              <div id="count_partners" style="font-size: 28px; font-weight: 700; color: var(--text-primary);">0</div>
+            </div>
           </div>
         </div>
 
-        <!-- Add Delivery Partner Card -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title"><ion-icon name="bicycle-outline"></ion-icon> Create Delivery Partner</div>
+        <!-- Lookup Search & Directory (MOVED TO TOP) -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
+            <div class="card-title"><ion-icon name="search-outline"></ion-icon> Directory Lookup</div>
+            <div class="card-actions"
+              style="display:flex; gap: 12px; align-items: center; flex: 1; max-width: 450px; margin-left: auto;">
+              <div class="input-with-icon" style="flex: 1;">
+                <ion-icon name="search-outline"></ion-icon>
+                <input type="text" class="form-control" placeholder="Search by name, ID, or vehicle..."
+                  style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+              </div>
+              <button class="btn btn-primary" style="padding: 10px 16px;">Search</button>
+            </div>
           </div>
-          <div class="card-body" style="padding: 24px;">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Onboard a new delivery agent to your logistics fleet.</p>
-            <div class="form-group">
-              <label class="form-label">Full Name</label>
-              <div class="input-with-icon">
-                <ion-icon name="person-outline"></ion-icon>
-                <input type="text" id="d_full_name" class="form-control" placeholder="e.g. Suresh Kumar" />
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Phone Number</label>
-                <div class="input-with-icon">
-                  <ion-icon name="phone-portrait-outline"></ion-icon>
-                  <input type="tel" id="d_phone" class="form-control" placeholder="+91" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Assigned Zone</label>
-                <div class="input-with-icon">
-                  <ion-icon name="compass-outline"></ion-icon>
-                  <select id="d_zone" class="form-control">
-                    <option>Zone A (North)</option>
-                    <option>Zone B (Central)</option>
-                    <option>Zone C (South)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label class="form-label">Username</label>
-                <div class="input-with-icon">
-                  <ion-icon name="at-outline"></ion-icon>
-                  <input type="text" id="d_username" class="form-control" placeholder="driver_username" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-with-icon">
-                  <ion-icon name="lock-closed-outline"></ion-icon>
-                  <input type="password" id="d_password" class="form-control" placeholder="••••••••" />
-                </div>
-              </div>
-            </div>
-            <div class="form-group">
-              <label class="form-label">Vehicle Number</label>
-              <div class="input-with-icon">
-                <ion-icon name="car-outline"></ion-icon>
-                <input type="text" id="d_vehicle" class="form-control" placeholder="e.g. MH-12 AB 1234" style="text-transform: uppercase;" />
-              </div>
-            </div>
-            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;">
-              <ion-icon name="shield-checkmark-outline"></ion-icon> Account ready for Supabase Auth integration.
-            </div>
-            <button id="btn_add_delivery" class="btn btn-outline" style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;"><ion-icon name="person-add-outline"></ion-icon> Add Delivery Partner</button>
+          <div class="card-body" style="padding: 0; overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Name / Store</th>
+                  <th>Zone</th>
+                  <th>Contact</th>
+                  <th>Vehicle / Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="directory_table_body">
+                <tr>
+                  <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading directory
+                    data...</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
-      </div>
 
-    </main><!-- /content -->
-  </div><!-- /main-wrapper -->
-</div><!-- /layout -->
-<!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/supabase-integration.js"></script>
-<script src="js/app.js"></script>
+        <!-- FORMS (MOVED TO BOTTOM) -->
+        <div class="section-title" style="margin-top: 32px; font-size: 18px;">Onboarding</div>
+        <div
+          style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px;">
+          <!-- Add Vendor Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><ion-icon name="storefront-outline"></ion-icon> Add New Vendor</div>
+            </div>
+            <div class="card-body" style="padding: 24px;">
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Register a new retail shop to
+                supply dairy products.</p>
+              <div class="form-group">
+                <label class="form-label">Store Name</label>
+                <div class="input-with-icon">
+                  <ion-icon name="business-outline"></ion-icon>
+                  <input type="text" id="v_store_name" class="form-control" placeholder="e.g. Ramesh Dairy" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="call-outline"></ion-icon>
+                    <input type="tel" id="v_phone" class="form-control" placeholder="+91" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Zone</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="map-outline"></ion-icon>
+                    <select id="v_zone" class="form-control">
+                      <option>Zone A (North)</option>
+                      <option>Zone B (Central)</option>
+                      <option>Zone C (South)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="at-outline"></ion-icon>
+                    <input type="text" id="v_username" class="form-control" placeholder="vendor_username" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" id="v_password" class="form-control" placeholder="••••••••" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Address</label>
+                <div class="input-with-icon" style="align-items: flex-start;">
+                  <ion-icon name="location-outline" style="top: 12px;"></ion-icon>
+                  <textarea id="v_address" class="form-control" rows="3" placeholder="Full store address..."></textarea>
+                </div>
+              </div>
+              <div
+                style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;">
+                <ion-icon name="information-circle-outline"></ion-icon> Credentials will be saved to Supabase securely.
+              </div>
+              <button id="btn_add_vendor" class="btn btn-primary"
+                style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;"><ion-icon
+                  name="add-circle-outline"></ion-icon> Register Vendor</button>
+            </div>
+          </div>
+
+          <!-- Add Delivery Partner Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title"><ion-icon name="bicycle-outline"></ion-icon> Create Delivery Partner</div>
+            </div>
+            <div class="card-body" style="padding: 24px;">
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Onboard a new delivery agent to
+                your logistics fleet.</p>
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <div class="input-with-icon">
+                  <ion-icon name="person-outline"></ion-icon>
+                  <input type="text" id="d_full_name" class="form-control" placeholder="e.g. Suresh Kumar" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Phone Number</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="phone-portrait-outline"></ion-icon>
+                    <input type="tel" id="d_phone" class="form-control" placeholder="+91" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Assigned Zone</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="compass-outline"></ion-icon>
+                    <select id="d_zone" class="form-control">
+                      <option>Zone A (North)</option>
+                      <option>Zone B (Central)</option>
+                      <option>Zone C (South)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label">Username</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="at-outline"></ion-icon>
+                    <input type="text" id="d_username" class="form-control" placeholder="driver_username" />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Password</label>
+                  <div class="input-with-icon">
+                    <ion-icon name="lock-closed-outline"></ion-icon>
+                    <input type="password" id="d_password" class="form-control" placeholder="••••••••" />
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Vehicle Number</label>
+                <div class="input-with-icon">
+                  <ion-icon name="car-outline"></ion-icon>
+                  <input type="text" id="d_vehicle" class="form-control" placeholder="e.g. MH-12 AB 1234"
+                    style="text-transform: uppercase;" />
+                </div>
+              </div>
+              <div
+                style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;">
+                <ion-icon name="shield-checkmark-outline"></ion-icon> Account ready for Supabase Auth integration.
+              </div>
+              <button id="btn_add_delivery" class="btn btn-outline"
+                style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;"><ion-icon
+                  name="person-add-outline"></ion-icon> Add Delivery Partner</button>
+            </div>
+          </div>
+        </div>
+
+      </main><!-- /content -->
+    </div><!-- /main-wrapper -->
+  </div><!-- /layout -->
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-integration.js"></script>
+  <script src="js/app.js"></script>
 
 </body>
+
 </html>
