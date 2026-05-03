@@ -133,11 +133,24 @@ async function fetchProducts() {
 // TRANSACTIONS MODULE
 // =========================================================================
 
+let _allTransactions = [];
+let _allVendorsTx = [];
+
 async function fetchTransactions() {
     const tableBody = document.getElementById('transactions_table_body');
     if (!tableBody) return; // Only run on transactions page
 
     try {
+        // Fetch vendors to populate dropdown and for summary stats
+        const { data: vendors, error: vError } = await supabaseClient
+            .from('vendors')
+            .select('id, store_name, username, outstanding_balance');
+            
+        if (!vError && vendors) {
+            _allVendorsTx = vendors;
+            renderVendorChips(_allVendorsTx);
+        }
+
         const { data: transactions, error } = await supabaseClient
             .from('transactions')
             .select('*')
@@ -145,53 +158,159 @@ async function fetchTransactions() {
 
         if (error) throw error;
 
-        if (!transactions || transactions.length === 0) {
-            tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No transactions found.</td></tr>';
-            return;
-        }
-
-        let rowsHTML = '';
-        transactions.forEach(t => {
-            const date = new Date(t.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-            const txnId = t.transaction_ref || (t.id ? t.id.substring(0, 8).toUpperCase() : 'N/A');
-            const entityName = t.vendor_name || t.delivery_partner_name || '—';
-            const amount = parseFloat(t.amount || 0).toLocaleString('en-IN');
-            
-            let paymentIcon = 'wallet-outline';
-            let tagClass = 'tag-info';
-            const mode = (t.payment_mode || '').toLowerCase();
-            
-            if (mode.includes('upi')) {
-                paymentIcon = 'phone-portrait-outline';
-                tagClass = 'tag-purple';
-            } else if (mode.includes('bank') || mode.includes('transfer')) {
-                paymentIcon = 'time-outline';
-                tagClass = 'tag-warning';
-            } else if (mode.includes('cash')) {
-                paymentIcon = 'wallet-outline';
-                tagClass = 'tag-success';
-            }
-            
-            const paymentModeDisplay = t.payment_mode ? (t.payment_mode.charAt(0).toUpperCase() + t.payment_mode.slice(1)) : 'Unknown';
-
-            rowsHTML += `
-              <tr>
-                <td>${date}</td>
-                <td style="font-family: monospace; color: var(--text-secondary);">${txnId}</td>
-                <td style="font-weight: 500;">${entityName}</td>
-                <td style="font-weight: 600;">₹ ${amount}</td>
-                <td><span class="tag ${tagClass}"><ion-icon name="${paymentIcon}"></ion-icon> ${paymentModeDisplay}</span></td>
-                <td><span class="tag tag-success">Completed</span></td>
-              </tr>
-            `;
+        _allTransactions = transactions || [];
+        
+        // Setup filter listeners
+        document.getElementById('dateFilter')?.addEventListener('change', applyTransactionFilters);
+        document.getElementById('searchFilter')?.addEventListener('input', applyTransactionFilters);
+        
+        document.getElementById('vendorSearchInput')?.addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = _allVendorsTx.filter(v => (v.store_name || v.username || '').toLowerCase().includes(val));
+            renderVendorChips(filtered);
         });
 
-        tableBody.innerHTML = rowsHTML;
+        applyTransactionFilters();
 
     } catch (error) {
         console.error("Error fetching transactions:", error);
         tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading transactions.</td></tr>`;
     }
+}
+
+let _activeVendorId = '';
+
+function renderVendorChips(vendors) {
+    const container = document.getElementById('vendorChipsContainer');
+    if (!container) return;
+    
+    let html = `<button class="vendor-chip ${_activeVendorId === '' ? 'active' : ''}" data-id="" onclick="window.selectVendor('')" style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--primary); background: ${_activeVendorId === '' ? 'var(--primary)' : 'transparent'}; color: ${_activeVendorId === '' ? 'white' : 'var(--text-main)'}; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; transition: all 0.2s;">
+                    All Vendors
+                </button>`;
+                
+    vendors.forEach(v => {
+        const name = v.store_name || v.username || 'Unknown';
+        const isActive = _activeVendorId === v.id;
+        html += `<button class="vendor-chip ${isActive ? 'active' : ''}" data-id="${v.id}" onclick="window.selectVendor('${v.id}')" style="padding: 8px 16px; border-radius: 20px; border: 1px solid ${isActive ? 'var(--primary)' : 'var(--border)'}; background: ${isActive ? 'var(--primary)' : 'transparent'}; color: ${isActive ? 'white' : 'var(--text-main)'}; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; transition: all 0.2s;">
+                    ${name}
+                </button>`;
+    });
+    container.innerHTML = html;
+}
+
+window.selectVendor = function(vendorId) {
+    _activeVendorId = vendorId;
+    
+    // Update chip styling
+    const chips = document.querySelectorAll('.vendor-chip');
+    chips.forEach(c => {
+        if (c.getAttribute('data-id') === vendorId) {
+            c.classList.add('active');
+            c.style.background = 'var(--primary)';
+            c.style.color = 'white';
+            c.style.borderColor = 'var(--primary)';
+        } else {
+            c.classList.remove('active');
+            c.style.background = 'transparent';
+            c.style.color = 'var(--text-main)';
+            c.style.borderColor = c.getAttribute('data-id') === '' ? 'var(--primary)' : 'var(--border)';
+            if(c.getAttribute('data-id') === '' && _activeVendorId !== '') {
+               c.style.borderColor = 'var(--border)'; 
+            }
+        }
+    });
+
+    applyTransactionFilters();
+};
+
+function applyTransactionFilters() {
+    const vendorId = _activeVendorId;
+    const dateVal = document.getElementById('dateFilter')?.value || '';
+    const searchVal = (document.getElementById('searchFilter')?.value || '').toLowerCase();
+    
+    // Vendor Summary Card Logic
+    const summaryCard = document.getElementById('vendorSummaryCard');
+    if (vendorId && summaryCard) {
+        const vendor = _allVendorsTx.find(v => v.id === vendorId);
+        
+        // Outstanding Dues
+        const dues = vendor?.outstanding_balance || 0;
+        document.getElementById('summaryDues').innerText = '₹ ' + parseFloat(dues).toLocaleString('en-IN');
+        
+        // Outstanding Containers (Mocked deterministic based on vendor id string length)
+        const mockContainers = vendor ? (vendor.id.charCodeAt(0) % 15) : 0;
+        document.getElementById('summaryContainers').innerText = mockContainers;
+        
+        // Total Paid (Calculated from transactions)
+        const vendorTxns = _allTransactions.filter(t => t.vendor_id === vendorId);
+        const totalPaid = vendorTxns.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+        document.getElementById('summaryPaid').innerText = '₹ ' + totalPaid.toLocaleString('en-IN');
+        
+        summaryCard.style.display = 'block';
+    } else if (summaryCard) {
+        summaryCard.style.display = 'none';
+    }
+
+    // Filter Transactions
+    const filtered = _allTransactions.filter(t => {
+        const tDate = t.created_at ? t.created_at.split('T')[0] : '';
+        const dateOk = !dateVal || tDate === dateVal;
+        const vendorOk = !vendorId || t.vendor_id === vendorId;
+        const searchStr = `${t.transaction_ref || ''} ${t.id || ''} ${t.vendor_name || ''}`.toLowerCase();
+        const searchOk = !searchVal || searchStr.includes(searchVal);
+        
+        return dateOk && vendorOk && searchOk;
+    });
+
+    renderTransactionsTable(filtered);
+}
+
+function renderTransactionsTable(transactions) {
+    const tableBody = document.getElementById('transactions_table_body');
+    if (!tableBody) return;
+
+    if (!transactions || transactions.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No transactions found.</td></tr>';
+        return;
+    }
+
+    let rowsHTML = '';
+    transactions.forEach(t => {
+        const date = new Date(t.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        const txnId = t.transaction_ref || (t.id ? t.id.substring(0, 8).toUpperCase() : 'N/A');
+        const entityName = t.vendor_name || t.delivery_partner_name || '—';
+        const amount = parseFloat(t.amount || 0).toLocaleString('en-IN');
+        
+        let paymentIcon = 'wallet-outline';
+        let tagClass = 'tag-info';
+        const mode = (t.payment_mode || '').toLowerCase();
+        
+        if (mode.includes('upi')) {
+            paymentIcon = 'phone-portrait-outline';
+            tagClass = 'tag-purple';
+        } else if (mode.includes('bank') || mode.includes('transfer')) {
+            paymentIcon = 'time-outline';
+            tagClass = 'tag-warning';
+        } else if (mode.includes('cash')) {
+            paymentIcon = 'wallet-outline';
+            tagClass = 'tag-success';
+        }
+        
+        const paymentModeDisplay = t.payment_mode ? (t.payment_mode.charAt(0).toUpperCase() + t.payment_mode.slice(1)) : 'Unknown';
+
+        rowsHTML += `
+          <tr>
+            <td>${date}</td>
+            <td style="font-family: monospace; color: var(--text-secondary);">${txnId}</td>
+            <td style="font-weight: 500;">${entityName}</td>
+            <td style="font-weight: 600;">₹ ${amount}</td>
+            <td><span class="tag ${tagClass}"><ion-icon name="${paymentIcon}"></ion-icon> ${paymentModeDisplay}</span></td>
+            <td><span class="tag tag-success">Completed</span></td>
+          </tr>
+        `;
+    });
+
+    tableBody.innerHTML = rowsHTML;
 }
 
 // =========================================================================

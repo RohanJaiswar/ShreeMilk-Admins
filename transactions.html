@@ -110,15 +110,63 @@
           </button>
         </div>
 
+        <!-- Vendor Selection Area -->
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 16px; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                <div style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                    <ion-icon name="people-outline" style="color: var(--primary); font-size: 20px;"></ion-icon> Vendor Overview
+                </div>
+                <div class="input-with-icon" style="flex: 1; max-width: 350px;">
+                    <ion-icon name="search-outline"></ion-icon>
+                    <input type="text" id="vendorSearchInput" class="form-control" placeholder="Search vendor by name..." style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+                </div>
+            </div>
+            
+            <div id="vendorChipsContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin;">
+                <button class="vendor-chip active" data-id="" onclick="window.selectVendor('')" style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--primary); background: var(--primary); color: white; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; transition: all 0.2s;">
+                    All Vendors
+                </button>
+                <!-- Vendor chips dynamically added here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Vendor Summary Card (Hidden by default) -->
+        <div id="vendorSummaryCard" style="display: none; margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                <div class="card" style="padding: 16px; border-left: 4px solid var(--danger);">
+                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <ion-icon name="wallet-outline"></ion-icon> Outstanding Dues
+                    </div>
+                    <div id="summaryDues" style="font-size: 24px; font-weight: 700; color: var(--danger);">₹ 0</div>
+                </div>
+                <div class="card" style="padding: 16px; border-left: 4px solid var(--warning);">
+                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <ion-icon name="cube-outline"></ion-icon> Outstanding Containers
+                    </div>
+                    <div id="summaryContainers" style="font-size: 24px; font-weight: 700; color: var(--warning);">0</div>
+                </div>
+                <div class="card" style="padding: 16px; border-left: 4px solid var(--success);">
+                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                        <ion-icon name="cash-outline"></ion-icon> Total Paid
+                    </div>
+                    <div id="summaryPaid" style="font-size: 24px; font-weight: 700; color: var(--success);">₹ 0</div>
+                </div>
+            </div>
+        </div>
+
         <div class="card">
           <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
-            <div class="card-title"><ion-icon name="cash-outline"></ion-icon> Recent Transactions</div>
+            <div class="card-title"><ion-icon name="list-outline"></ion-icon> Transaction History</div>
             <div class="card-actions"
-              style="display:flex; gap: 12px; align-items: center; flex: 1; max-width: 450px; margin-left: auto;">
-              <input type="date" class="form-control" style="padding: 8px 12px; font-size: 13px; max-width: 150px;" />
-              <div class="input-with-icon" style="flex: 1;">
+              style="display:flex; gap: 12px; align-items: center; flex: 1; justify-content: flex-end;">
+              
+              <input type="date" id="dateFilter" class="form-control" style="padding: 8px 12px; font-size: 13px; max-width: 150px;" />
+              
+              <div class="input-with-icon" style="max-width: 200px;">
                 <ion-icon name="search-outline"></ion-icon>
-                <input type="text" class="form-control" placeholder="Search by ID or Vendor..."
+                <input type="text" id="searchFilter" class="form-control" placeholder="Search ID..."
                   style="padding: 10px 14px 10px 40px; font-size: 13px;" />
               </div>
             </div>
