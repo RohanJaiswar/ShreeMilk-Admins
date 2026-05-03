@@ -461,21 +461,35 @@
           if (o.id) {
             const safeId = String(o.id);
             const invNo = safeId.substring(0, 8).toUpperCase();
-            new QRCode(document.getElementById(`qrcode-${safeId}`), {
-              text: safeId,
-              width: 80,
-              height: 80,
-              colorDark : "#0F172A",
-              colorLight : "#ffffff",
-              correctLevel : QRCode.CorrectLevel.M
-            });
-            JsBarcode(`#barcode-${safeId}`, "INV-" + invNo, {
-              format: "CODE128",
-              height: 25,
-              width: 1.2,
-              displayValue: false,
-              margin: 0
-            });
+            
+            try {
+              new QRCode(document.getElementById(`qrcode-${safeId}`), {
+                text: safeId,
+                width: 80,
+                height: 80,
+                colorDark : "#0F172A",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+              });
+            } catch(e) {
+              console.error("QRCode Error:", e);
+            }
+
+            try {
+              if (window.JsBarcode) {
+                JsBarcode(document.getElementById(`barcode-${safeId}`), "INV-" + invNo, {
+                  format: "CODE128",
+                  height: 25,
+                  width: 1.2,
+                  displayValue: false,
+                  margin: 0
+                });
+              } else {
+                console.warn("JsBarcode library not loaded.");
+              }
+            } catch(e) {
+              console.error("JsBarcode Error:", e);
+            }
           }
         });
 
