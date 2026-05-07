@@ -145,10 +145,10 @@ function renderVendorTable() {
       <td>
         <div style="display:flex;align-items:center;gap:8px">
           ${v.due > 0
-            ? `<button class="btn btn-sm btn-primary" onclick="collectNow('${v.name.replace(/'/g, "\\'")}',${ v.due })"><ion-icon name='cash-outline'></ion-icon> Collect</button>`
+            ? `<button class="btn btn-sm btn-primary" onclick="collectNow('${v.id}', '${v.name.replace(/'/g, "\\'")}',${ v.due })"><ion-icon name='cash-outline'></ion-icon> Collect</button>`
             : `<button class="btn btn-sm btn-success" disabled style="cursor:default;"><ion-icon name='checkmark-circle-outline'></ion-icon> Paid</button>`
           }
-          <button class="btn-link" onclick="viewHistory('${v.name.replace(/'/g, "\\'")}')" style="font-size:12px;color:var(--primary);">History</button>
+          <button class="btn-link" onclick="viewHistory('${v.id}', '${v.name.replace(/'/g, "\\'")}')" style="font-size:12px;color:var(--primary);">History</button>
         </div>
       </td>
     </tr>`).join('');
@@ -352,7 +352,7 @@ window.quickActionRecordPayment = function() {
 };
 
 /* ── COLLECT NOW / VIEW HISTORY (vendor table) ── */
-window.collectNow = function(vendorName, vendorDue) {
+window.collectNow = function(vendorId, vendorName, vendorDue) {
   showModal(
     '<ion-icon name="cash-outline"></ion-icon> Collect Payment — ' + vendorName,
     `<div style="margin-bottom:16px;">
@@ -371,19 +371,45 @@ window.collectNow = function(vendorName, vendorDue) {
         <option value="bank_transfer">Bank Transfer</option>
       </select>
     </div>`,
-    [{ label: '<ion-icon name="checkmark-outline"></ion-icon> Record Collection', cls: 'btn-primary', action: () => {
+    [{ label: '<ion-icon name="checkmark-outline"></ion-icon> Record Collection', cls: 'btn-primary', action: async () => {
         const amt = document.getElementById('modal_collect_amount')?.value;
+        const mode = document.getElementById('modal_collect_mode')?.value;
         if (!amt || isNaN(amt) || parseFloat(amt) <= 0) { showToast('❌ Please enter a valid amount.', 'error'); return; }
+        
+        // Log transaction to Supabase
+        if (window.supabaseClient) {
+            try {
+                const txn = {
+                    vendor_id: vendorId,
+                    vendor_name: vendorName,
+                    amount: parseFloat(amt),
+                    payment_mode: mode,
+                    transaction_ref: 'TXN-' + Math.random().toString(36).substr(2, 6).toUpperCase()
+                };
+                await window.supabaseClient.from('transactions').insert([txn]);
+                // Update outstanding balance
+                const newDue = vendorDue - parseFloat(amt);
+                await window.supabaseClient.from('vendors').update({ outstanding_balance: newDue }).eq('id', vendorId);
+                
+                // Recalculate precise balances globally
+                if (window.recalculateVendorBalances) await window.recalculateVendorBalances();
+            } catch (err) {
+                console.error("Error logging payment:", err);
+                showToast('❌ Error recording payment.', 'error');
+                return;
+            }
+        }
+
         showToast(`✅ ₹${parseFloat(amt).toLocaleString('en-IN')} collected from ${vendorName}`, 'success');
         closeModal();
-        window.location.href = 'transactions.html';
+        setTimeout(() => { window.location.href = 'transactions.html'; }, 1000);
       }
     },
     { label: 'Cancel', cls: 'btn-outline', action: closeModal }]
   );
 };
 
-window.viewHistory = function(vendorName) {
+window.viewHistory = function(vendorId, vendorName) {
   window.location.href = 'transactions.html';
 };
 
@@ -505,9 +531,10 @@ function downloadCSVAsExcel(rows, filename) {
 document.addEventListener('DOMContentLoaded', () => {
   initSidebar();
   initDate();
-  renderKpi();
-  initCharts();
-  initVendorTable();
+  // Data rendering is now triggered by Supabase after fetching
+  // renderKpi();
+  // initCharts();
+  initVendorTable(); // We still init event listeners here, data will re-render later
   initProductsTable();
   initDelivery();
   initExpandPanels();

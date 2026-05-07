@@ -12,6 +12,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_na3VEkRe9gb7Nysy5crL1g_oR-M2W9x';
 let supabaseClient;
 if (window.supabase) {
     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    window.supabaseClient = supabaseClient; // Export globally for app.js
     console.log("Supabase client initialized!");
 } else {
     console.warn("Supabase library not found. Please ensure the CDN script is included.");
@@ -678,80 +679,141 @@ async function fetchDashboardData() {
     if (!document.getElementById('vendorTbody') && !document.getElementById('kpiGrid')) return;
 
     try {
-        // Fetch all necessary data for KPIs
-        const today = new Date().toISOString().split('T')[0];
-        
+        // Compute last 7 days range
+        const todayStr = new Date().toISOString().split('T')[0];
+        const last7Days = [];
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        const dayLabels = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            last7Days.push(d.toISOString().split('T')[0]);
+            dayLabels.push(`${d.getDate()} ${monthNames[d.getMonth()]}`);
+        }
+        const minDate = last7Days[0];
+
         const [
             { data: vendors, error: vError },
             { data: products, error: pError },
             { data: partners, error: dpError },
-            { data: ordersToday, error: oError },
-            { data: transactions, error: tError }
+            { data: ordersAll, error: oError },
+            { data: transactionsAll, error: tError }
         ] = await Promise.all([
             supabaseClient.from('vendors').select('*'),
             supabaseClient.from('products').select('*'),
             supabaseClient.from('delivery_partners').select('*'),
-            supabaseClient.from('orders').select('id, total_amount, status').eq('order_date', today),
-            supabaseClient.from('transactions').select('amount')
+            supabaseClient.from('orders').select('id, total_amount, status, vendor_id, items, order_date').gte('order_date', minDate),
+            supabaseClient.from('transactions').select('amount, created_at').gte('created_at', minDate + 'T00:00:00')
         ]);
 
         // Process KPI Data
         if (document.getElementById('kpiGrid')) {
-            // Calculate Orders Today
-            const totalOrdersToday = (ordersToday || []).length;
+            const ordersTodayArr = (ordersAll || []).filter(o => o.order_date === todayStr);
+            const totalOrdersToday = ordersTodayArr.length;
             
-            // Calculate Total Revenue (All completed transactions)
-            const totalRevenue = (transactions || []).reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            // Revenue for today
+            const totalRevenueToday = ordersTodayArr.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
             
-            // Update the global DATA object for KPI
-            const kpiObj = DATA.kpi;
-            
-            // Update Revenue KPI
-            if (kpiObj[0]) {
-                kpiObj[0].value = '₹' + totalRevenue.toLocaleString('en-IN');
-                kpiObj[0].trend = 'Live';
-                kpiObj[0].sub = 'total collected';
-            }
-            
-            // Update Orders Today KPI
-            if (kpiObj[2]) {
-                kpiObj[2].value = totalOrdersToday.toString();
-                kpiObj[2].trend = 'Live';
-                kpiObj[2].sub = 'dispatched/pending';
-            }
+            const totalDues = (vendors || []).reduce((sum, v) => sum + Math.max(0, parseFloat(v.outstanding_balance || 0)), 0);
+            const totalContainers = (vendors || []).reduce((sum, v) => sum + Math.max(0, parseInt(v.containers_balance || 0)), 0);
 
-            // We mock Pending Dues and Containers out as there is no specific table for them yet
+            DATA.kpi = [
+                { id: 'revenue', label: 'Revenue Today', value: '₹' + totalRevenueToday.toLocaleString('en-IN'), trend: 'Live', trendDir: 'neutral', sub: 'Today', color: 'green', icon: '<ion-icon name="cash-outline"></ion-icon>' },
+                { id: 'dues', label: 'Total Pending Dues', value: '₹' + totalDues.toLocaleString('en-IN'), trend: 'Live', trendDir: 'neutral', sub: 'Across all vendors', color: 'red', icon: '<ion-icon name="warning-outline"></ion-icon>' },
+                { id: 'orders', label: 'Orders Today', value: totalOrdersToday.toString(), trend: 'Live', trendDir: 'neutral', sub: 'Today', color: 'blue', icon: '<ion-icon name="cube-outline"></ion-icon>' },
+                { id: 'containers', label: 'Containers Out', value: totalContainers.toString(), trend: 'Live', trendDir: 'neutral', sub: 'Across all vendors', color: 'orange', icon: '<ion-icon name="water-outline"></ion-icon>' }
+            ];
             
-            // Re-render KPI
             if (typeof renderKpi === 'function') renderKpi();
         }
 
+        // Process Charts
+        DATA.months = dayLabels;
+        const revArr = Array(7).fill(0);
+        const colArr = Array(7).fill(0);
+        const ordArr = Array(7).fill(0);
+
+        const productCounts = {};
+
+        if (ordersAll) {
+            ordersAll.forEach(o => {
+                const idx = last7Days.indexOf(o.order_date);
+                if (idx !== -1 && o.status !== 'cancelled') {
+                    revArr[idx] += parseFloat(o.total_amount || 0);
+                    ordArr[idx] += 1;
+                }
+                
+                // For Most Purchased Product
+                if (o.status !== 'cancelled' && o.items) {
+                    let items = [];
+                    try { items = typeof o.items === 'string' ? JSON.parse(o.items) : o.items; } catch(e){}
+                    items.forEach(i => {
+                        const name = i.name || i.product_name;
+                        const qty = parseInt(i.qty || i.quantity || 1);
+                        if (name) productCounts[name] = (productCounts[name] || 0) + qty;
+                    });
+                }
+            });
+        }
+        if (transactionsAll) {
+            transactionsAll.forEach(t => {
+                const tDate = t.created_at.split('T')[0];
+                const idx = last7Days.indexOf(tDate);
+                if (idx !== -1) {
+                    colArr[idx] += parseFloat(t.amount || 0);
+                }
+            });
+        }
+        DATA.revenue = revArr;
+        DATA.collection = colArr;
+        DATA.orders = ordArr;
+        
+        const dateRangeEl = document.getElementById('weeklyDateRange');
+        if (dateRangeEl) dateRangeEl.textContent = `${dayLabels[0]} – ${dayLabels[6]}`;
+
+        const topProducts = Object.keys(productCounts).map(k => ({ label: k, count: productCounts[k] })).sort((a,b)=>b.count-a.count).slice(0, 5);
+        const colors = ['#1677ff', '#52c41a', '#fa8c16', '#722ed1', '#ff4d4f'];
+        const totalTop = topProducts.reduce((sum, p) => sum + p.count, 0) || 1;
+        DATA.donut = topProducts.map((p, i) => ({
+            label: p.label,
+            pct: Math.round((p.count / totalTop) * 100),
+            color: colors[i % colors.length]
+        }));
+        
+        if (typeof initCharts === 'function') initCharts();
+
         // Process Vendors (Users)
         if (!vError && vendors && vendors.length > 0) {
-            DATA.vendors = vendors.map((v, index) => ({
-                id: v.id || index + 1,
-                name: v.store_name || v.username || 'Unknown',
-                zone: v.zone || 'Zone A',
-                orders: Math.floor(Math.random() * 25) + 1, // Mock orders for UI
-                due: Math.floor(Math.random() * 4000),      // Mock dues
-                lastPay: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-                status: ['Paid', 'Overdue', 'Partial'][Math.floor(Math.random() * 3)]
-            }));
+            DATA.vendors = vendors.map((v, index) => {
+                const due = parseFloat(v.outstanding_balance || 0);
+                return {
+                    id: v.id || index + 1,
+                    name: v.store_name || v.username || 'Unknown',
+                    zone: v.zone || 'Zone A',
+                    orders: (ordersAll || []).filter(o => o.vendor_id === v.id && o.order_date === todayStr).length,
+                    due: due,
+                    lastPay: '—', // This can be updated by fetching latest transaction if needed
+                    status: due > 0 ? 'Overdue' : 'Paid'
+                };
+            });
             if (typeof renderVendorTable === 'function') renderVendorTable();
         }
 
-        // Process Products
+        // Process Products Table
         if (!pError && products && products.length > 0) {
-            const mappedProducts = products.map((p, idx) => ({
-                rank: idx + 1,
-                name: p.product_name,
-                category: p.category,
-                units: Math.floor(Math.random() * 200) + 10,
-                revenue: '₹' + (parseFloat(p.base_price || 100) * 10).toLocaleString('en-IN'),
-                avgDaily: Math.floor(Math.random() * 10) + 1,
-                spark: [4,5,6,4,5,6,5],
-                stock: ['OK', 'OK', 'Low Stock', 'Critical'][Math.floor(Math.random() * 4)]
-            }));
+            const mappedProducts = products.map((p, idx) => {
+                const count = productCounts[p.product_name] || 0;
+                return {
+                    rank: idx + 1,
+                    name: p.product_name,
+                    category: p.category,
+                    units: count,
+                    revenue: '₹' + (count * parseFloat(p.base_price || 0)).toLocaleString('en-IN'),
+                    avgDaily: Math.round(count / 7),
+                    spark: [0,0,0,0,0,0,0], // Real spark data could be aggregated
+                    stock: 'OK'
+                };
+            }).sort((a,b) => b.units - a.units).map((p, idx) => ({...p, rank: idx + 1}));
             
             DATA.products.month = mappedProducts;
             DATA.products.week = mappedProducts;
@@ -762,13 +824,18 @@ async function fetchDashboardData() {
 
         // Process Delivery Partners
         if (!dpError && partners && partners.length > 0) {
+            const todayOrders = (ordersAll || []).filter(o => o.order_date === todayStr);
+            DATA.delivery.total = todayOrders.length;
+            DATA.delivery.delivered = todayOrders.filter(o => o.status === 'delivered').length;
+            DATA.delivery.missed = todayOrders.filter(o => o.status === 'cancelled').length;
+            
             DATA.delivery.agents = partners.map(p => ({
                 name: p.full_name,
                 zone: p.assigned_zone || 'Zone A',
-                delivered: Math.floor(Math.random() * 20),
-                missed: Math.floor(Math.random() * 2),
-                pending: Math.floor(Math.random() * 5),
-                collected: '₹' + (Math.floor(Math.random() * 1000))
+                delivered: todayOrders.filter(o => o.status === 'delivered').length, // Will be exact if orders have delivery_partner_id
+                missed: 0,
+                pending: todayOrders.filter(o => o.status === 'pending').length,
+                collected: '₹0'
             }));
             if (typeof renderDelivery === 'function') renderDelivery();
         }
@@ -778,18 +845,59 @@ async function fetchDashboardData() {
     }
 }
 
+window.recalculateVendorBalances = async function() {
+    try {
+        console.log("Recalculating precise vendor balances based on orders & transactions...");
+        const { data: vendors, error: vErr } = await supabaseClient.from('vendors').select('id, outstanding_balance');
+        if (vErr || !vendors) return;
+
+        const { data: orders } = await supabaseClient.from('orders').select('vendor_id, total_amount, status');
+        const { data: transactions } = await supabaseClient.from('transactions').select('vendor_id, amount');
+
+        const vData = vendors.map(v => {
+            const vOrders = (orders || []).filter(o => o.vendor_id === v.id && o.status !== 'cancelled');
+            const vTxns = (transactions || []).filter(t => t.vendor_id === v.id);
+
+            const totalOrdered = vOrders.reduce((sum, o) => sum + parseFloat(o.total_amount || 0), 0);
+            const totalPaid = vTxns.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
+            const newBalance = totalOrdered - totalPaid;
+
+            return { id: v.id, balance: newBalance, oldBalance: v.outstanding_balance };
+        });
+
+        for (const v of vData) {
+            if (Math.abs(v.balance - parseFloat(v.oldBalance || 0)) > 0.01) {
+                await supabaseClient.from('vendors').update({ outstanding_balance: v.balance }).eq('id', v.id);
+            }
+        }
+        console.log("Vendor balances recalculated successfully!");
+    } catch (e) {
+        console.error("Error recalculating vendor balances:", e);
+    }
+};
+
 // 3. INITIALIZATION FUNCTION
 function initSupabaseForms() {
     console.log("Initializing forms and fetching data...");
 
-    // Fetch orders if on delivery page
-    fetchOrders();
-
-    // Fetch initial data for other pages
-    fetchDirectory();
-    fetchProducts();
-    fetchTransactions();
-    fetchDashboardData();
+    // Recalculate precise vendor balances first
+    if (window.recalculateVendorBalances) {
+        window.recalculateVendorBalances().then(() => {
+            // Fetch orders if on delivery page
+            fetchOrders();
+            // Fetch initial data for other pages
+            fetchDirectory();
+            fetchProducts();
+            fetchTransactions();
+            fetchDashboardData();
+        });
+    } else {
+        fetchOrders();
+        fetchDirectory();
+        fetchProducts();
+        fetchTransactions();
+        fetchDashboardData();
+    }
 
     /* ----------------------------------------------------------------------
      * CONTAINER MANAGEMENT LOGIC

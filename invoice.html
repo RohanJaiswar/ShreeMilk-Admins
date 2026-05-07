@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Invoice - Shreeji Milk Center</title>
@@ -9,12 +10,14 @@
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     :root {
-      --primary: #14532D; /* Deep Green */
+      --primary: #14532D;
+      /* Deep Green */
       --text-main: #0F172A;
       --text-muted: #64748b;
       --border: #e2e8f0;
       --bg-light: #f8fafc;
     }
+
     body {
       font-family: 'Inter', sans-serif;
       margin: 0;
@@ -22,6 +25,7 @@
       background: #f0f2f5;
       color: var(--text-main);
     }
+
     .invoice-box {
       max-width: 800px;
       margin: auto;
@@ -31,21 +35,25 @@
       border-radius: 12px;
       position: relative;
     }
+
     .invoice-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      background: #f1f5f9; /* Light slate/grey background */
+      background: #f1f5f9;
+      /* Light slate/grey background */
       padding: 16px;
       border-radius: 12px;
       border: 1px solid var(--border);
       margin-bottom: 20px;
     }
+
     .brand-section {
       display: flex;
       align-items: center;
       gap: 16px;
     }
+
     .logo-box img {
       height: 60px;
       width: 120px;
@@ -54,8 +62,10 @@
       border: 2px solid var(--primary);
       padding: 4px;
       background: transparent;
-      mix-blend-mode: multiply; /* This removes the white background of the image itself */
+      mix-blend-mode: multiply;
+      /* This removes the white background of the image itself */
     }
+
     .brand-info h1 {
       margin: 0 0 4px 0;
       font-size: 26px;
@@ -63,6 +73,7 @@
       color: var(--primary);
       letter-spacing: 0.5px;
     }
+
     .brand-info p {
       margin: 0;
       font-size: 12px;
@@ -70,31 +81,35 @@
       max-width: 250px;
       line-height: 1.5;
     }
+
     .header-right {
       display: flex;
       align-items: flex-start;
       gap: 20px;
       text-align: right;
     }
+
     .contact-info {
       font-size: 13px;
       color: var(--text-muted);
       line-height: 1.6;
       margin-top: 5px;
     }
+
     .contact-info strong {
       color: var(--text-main);
       display: block;
       font-size: 14px;
       margin-bottom: 4px;
     }
+
     .qrcode-wrapper {
       padding: 8px;
       background: #fff;
       border: 1px solid var(--border);
       border-radius: 8px;
     }
-    
+
     .meta-row {
       display: flex;
       justify-content: space-between;
@@ -104,6 +119,7 @@
       border-radius: 8px;
       border: 1px solid var(--border);
     }
+
     .meta-col .label {
       font-size: 11px;
       color: var(--text-muted);
@@ -112,6 +128,7 @@
       margin-bottom: 4px;
       font-weight: 600;
     }
+
     .meta-col .val {
       font-size: 16px;
       font-weight: 700;
@@ -121,6 +138,7 @@
     .bill-to {
       margin-bottom: 20px;
     }
+
     .bill-to h3 {
       font-size: 12px;
       color: var(--text-muted);
@@ -128,11 +146,13 @@
       letter-spacing: 1px;
       margin: 0 0 10px 0;
     }
+
     .bill-to p {
       margin: 4px 0;
       font-size: 15px;
       color: var(--text-main);
     }
+
     .bill-to strong {
       font-size: 18px;
       display: block;
@@ -144,11 +164,14 @@
       border-collapse: collapse;
       margin-bottom: 10px;
     }
-    table.modern-table th, table.modern-table td {
+
+    table.modern-table th,
+    table.modern-table td {
       padding: 10px 12px;
       text-align: left;
       font-size: 13px;
     }
+
     table.modern-table th {
       background: var(--bg-light);
       color: var(--text-muted);
@@ -158,31 +181,42 @@
       letter-spacing: 0.5px;
       border-bottom: 2px solid var(--border);
     }
+
     table.modern-table td {
       border-bottom: 1px solid var(--border);
     }
-    .center { text-align: center !important; }
-    .right { text-align: right !important; }
-    
+
+    .center {
+      text-align: center !important;
+    }
+
+    .right {
+      text-align: right !important;
+    }
+
     .totals-container {
       display: flex;
       justify-content: flex-end;
       margin-bottom: 20px;
     }
+
     .totals-table {
       width: 300px;
       border-collapse: collapse;
     }
+
     .totals-table td {
       padding: 10px 16px;
       font-size: 14px;
       color: var(--text-main);
       border-bottom: 1px solid var(--border);
     }
+
     .totals-table td.label {
       font-weight: 600;
       color: var(--text-muted);
     }
+
     .totals-table tr.grand-total td {
       font-size: 18px;
       font-weight: 800;
@@ -199,21 +233,25 @@
       padding-top: 20px;
       font-size: 11px;
     }
+
     .terms {
       color: var(--text-muted);
       line-height: 1.8;
     }
+
     .terms h4 {
       margin: 0 0 8px 0;
       color: var(--text-main);
       font-size: 13px;
     }
+
     .signature {
       text-align: center;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
     }
+
     .signature-line {
       width: 150px;
       border-top: 1px solid var(--text-main);
@@ -227,46 +265,60 @@
         size: A4;
         margin: 5mm;
       }
+
       body {
         background: #fff;
         padding: 0;
-        font-size: 11px; /* Slightly smaller text for print to fit A4 */
+        font-size: 11px;
+        /* Slightly smaller text for print to fit A4 */
       }
+
       .invoice-box {
         box-shadow: none;
         border: none;
         border-radius: 0;
         padding: 0;
         max-width: 100%;
-        height: 287mm; /* Total A4 height minus margins */
+        height: 287mm;
+        /* Total A4 height minus margins */
         display: flex;
         flex-direction: column;
         page-break-after: always;
       }
+
       .invoice-header {
         margin-bottom: 15px;
-        padding: 12px; /* Less padding for print to save space */
-        background: #f1f5f9 !important; /* Force background color to print */
+        padding: 12px;
+        /* Less padding for print to save space */
+        background: #ffffff !important;
+        /* Force background color to print */
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
       }
+
       .meta-row {
         margin-bottom: 15px;
         padding: 10px 12px;
       }
+
       .bill-to {
         margin-bottom: 15px;
       }
+
       .totals-container {
-        margin-bottom: auto; /* Pushes the footer to the bottom */
+        margin-bottom: auto;
+        /* Pushes the footer to the bottom */
       }
-      table.modern-table th, table.modern-table td {
+
+      table.modern-table th,
+      table.modern-table td {
         padding: 6px 10px;
         font-size: 11px;
       }
     }
   </style>
 </head>
+
 <body>
   <div id="invoices-container"></div>
 
@@ -282,18 +334,18 @@
       try {
         const SUPABASE_URL = 'https://tqtvxtipqbnvyquljgtg.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_na3VEkRe9gb7Nysy5crL1g_oR-M2W9x';
-        
+
         if (!window.supabase) {
-           throw new Error("Supabase library not loaded.");
+          throw new Error("Supabase library not loaded.");
         }
-        
+
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let orders = [];
         if (orderIdParam) {
           const { data, error } = await supabaseClient
             .from('orders')
-            .select('*, vendors(address)')
+            .select('*, vendors(address, containers_balance, outstanding_balance)')
             .eq('id', orderIdParam);
           if (error) throw error;
           orders = data || [];
@@ -301,7 +353,7 @@
           const today = new Date().toISOString().split('T')[0];
           const { data, error } = await supabaseClient
             .from('orders')
-            .select('*, vendors(address)')
+            .select('*, vendors(address, containers_balance, outstanding_balance)')
             .eq('order_date', today);
           if (error) throw error;
           orders = data || [];
@@ -320,6 +372,35 @@
           }];
         }
 
+        // Fallback: fetch containers_balance separately if join didn't return it
+        const vendorIds = [...new Set(orders.map(o => o.vendor_id).filter(Boolean))];
+        if (vendorIds.length > 0) {
+          const needsFetch = orders.some(o => !o.vendors || o.vendors.containers_balance == null);
+          if (needsFetch) {
+            const { data: vendorData } = await supabaseClient
+              .from('vendors')
+              .select('id, address, containers_balance, outstanding_balance')
+              .in('id', vendorIds);
+            if (vendorData) {
+              const vendorMap = {};
+              vendorData.forEach(v => { vendorMap[v.id] = v; });
+              orders = orders.map(o => ({
+                ...o,
+                vendors: {
+                  ...(o.vendors || {}),
+                  address: (o.vendors && o.vendors.address) || (vendorMap[o.vendor_id] && vendorMap[o.vendor_id].address) || '',
+                  containers_balance: (o.vendors && o.vendors.containers_balance != null)
+                    ? o.vendors.containers_balance
+                    : (vendorMap[o.vendor_id] ? vendorMap[o.vendor_id].containers_balance : null),
+                  outstanding_balance: (o.vendors && o.vendors.outstanding_balance != null)
+                    ? o.vendors.outstanding_balance
+                    : (vendorMap[o.vendor_id] ? vendorMap[o.vendor_id].outstanding_balance : null)
+                }
+              }));
+            }
+          }
+        }
+
         if (orders.length === 0) {
           document.getElementById('invoices-container').innerHTML = '<h2 style="text-align:center; margin-top:50px;">No orders found to print.</h2>';
           return;
@@ -333,12 +414,22 @@
           const invNo = safeId ? safeId.substring(0, 8).toUpperCase() : 'N/A';
           const vendorName = o.vendor_name || 'N/A';
           const totalAmount = parseFloat(o.total_amount || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
-          
+          const containersBalance = (o.vendors && o.vendors.containers_balance != null) ? parseInt(o.vendors.containers_balance) : null;
+
+          const outstandingBalance = (o.vendors && o.vendors.outstanding_balance != null) ? parseFloat(o.vendors.outstanding_balance) : 0;
+          let advanceStr = '₹ 0.00';
+          let balanceStr = '₹ 0.00';
+          if (outstandingBalance < 0) {
+            advanceStr = '₹ ' + Math.abs(outstandingBalance).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+          } else if (outstandingBalance > 0) {
+            balanceStr = '₹ ' + outstandingBalance.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+          }
+
           let items = [];
           try {
             items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items || []);
-          } catch(e) {}
-          
+          } catch (e) { }
+
           let itemsHtml = '';
           if (items && items.length > 0) {
             itemsHtml = items.map((item, i) => {
@@ -378,8 +469,7 @@
                 <div class="header-right">
                   <div class="contact-info">
                     <strong>Contact Us</strong>
-                    8850853778<br>
-                    7718950155
+                    8850853778
                   </div>
                   <div class="qrcode-wrapper" id="qrcode-${safeId}"></div>
                 </div>
@@ -394,6 +484,11 @@
                 <div class="meta-col" style="text-align: right;">
                   <div class="label">Date of Issue</div>
                   <div class="val">${displayDate}</div>
+                  <div style="margin-top: 12px;">
+                    ${outstandingBalance <= 0
+              ? '<span style="background:var(--success, #16a34a); color:white; padding:4px 12px; border-radius:4px; font-weight:700; font-size:14px; letter-spacing:1px; display:inline-block;">PAID</span>'
+              : '<span style="background:var(--danger, #dc2626); color:white; padding:4px 12px; border-radius:4px; font-weight:700; font-size:14px; letter-spacing:1px; display:inline-block;">DUE</span>'}
+                  </div>
                 </div>
               </div>
 
@@ -425,11 +520,11 @@
                 <table class="totals-table">
                   <tr>
                     <td class="label">Advance (ADV.)</td>
-                    <td class="right">—</td>
+                    <td class="right" style="color:var(--success);font-weight:600;">${advanceStr}</td>
                   </tr>
                   <tr>
                     <td class="label">Balance (BAL.)</td>
-                    <td class="right">—</td>
+                    <td class="right" style="color:var(--danger);font-weight:600;">${balanceStr}</td>
                   </tr>
                   <tr class="grand-total">
                     <td class="label" style="color:var(--primary);">TOTAL</td>
@@ -451,6 +546,10 @@
                 </div>
               </div>
 
+              <div style="text-align: center; margin-top: 20px; font-weight: 700; font-size: 14px; color: var(--primary); border-top: 1px dashed var(--border); padding-top: 10px; width: 100%;">
+                Shreeji Milk Center Pvt. Ltd. Co
+              </div>
+
             </div>
           `;
         });
@@ -461,17 +560,17 @@
           if (o.id) {
             const safeId = String(o.id);
             const invNo = safeId.substring(0, 8).toUpperCase();
-            
+
             try {
               new QRCode(document.getElementById(`qrcode-${safeId}`), {
                 text: safeId,
                 width: 80,
                 height: 80,
-                colorDark : "#0F172A",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.M
+                colorDark: "#0F172A",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
               });
-            } catch(e) {
+            } catch (e) {
               console.error("QRCode Error:", e);
             }
 
@@ -487,7 +586,7 @@
               } else {
                 console.warn("JsBarcode library not loaded.");
               }
-            } catch(e) {
+            } catch (e) {
               console.error("JsBarcode Error:", e);
             }
           }
@@ -508,4 +607,5 @@
     }
   </script>
 </body>
+
 </html>

@@ -1,5 +1,7 @@
 /* ── CHARTS MODULE (Chart.js) ── */
 
+let chartRevenue, chartOrder, chartDonut;
+
 function initCharts() {
   initRevenueChart();
   initOrderChart();
@@ -8,8 +10,11 @@ function initCharts() {
 
 /* ── Revenue vs Collection Bar Chart ── */
 function initRevenueChart() {
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  new Chart(ctx, {
+  const canvas = document.getElementById('revenueChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (chartRevenue) chartRevenue.destroy();
+  chartRevenue = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: DATA.months,
@@ -60,9 +65,12 @@ function initRevenueChart() {
 
 /* ── Order Volume Line Chart ── */
 function initOrderChart() {
-  const avg = Math.round(DATA.orders.reduce((a, b) => a + b, 0) / DATA.orders.length);
-  const ctx = document.getElementById('orderChart').getContext('2d');
-  new Chart(ctx, {
+  const canvas = document.getElementById('orderChart');
+  if (!canvas) return;
+  const avg = DATA.orders.length > 0 ? Math.round(DATA.orders.reduce((a, b) => a + b, 0) / DATA.orders.length) : 0;
+  const ctx = canvas.getContext('2d');
+  if (chartOrder) chartOrder.destroy();
+  chartOrder = new Chart(ctx, {
     type: 'line',
     data: {
       labels: DATA.months,
@@ -108,8 +116,11 @@ function initOrderChart() {
 
 /* ── Product Sales Donut Chart ── */
 function initDonutChart() {
-  const ctx = document.getElementById('donutChart').getContext('2d');
-  new Chart(ctx, {
+  const canvas = document.getElementById('donutChart');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  if (chartDonut) chartDonut.destroy();
+  chartDonut = new Chart(ctx, {
     type: 'doughnut',
     data: {
       labels: DATA.donut.map(d => d.label),
@@ -147,7 +158,7 @@ function initDonutChart() {
 
 /* ── SVG Progress Circle ── */
 function renderProgressCircle(delivered, total) {
-  const pct = delivered / total;
+  const pct = total === 0 ? 0 : delivered / total;
   const r = 54, cx = 64, cy = 64;
   const circ = 2 * Math.PI * r;
   const offset = circ * (1 - pct);

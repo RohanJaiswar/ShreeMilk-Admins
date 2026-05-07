@@ -121,14 +121,14 @@
         <div class="kpi-grid" id="kpiGrid"><!-- JS rendered --></div>
 
         <!-- ─── SECTION 2: CHARTS ─── -->
-        <div class="section-title">Monthly Analytics</div>
+        <div class="section-title">Weekly Analytics</div>
         <div class="charts-grid">
 
           <div class="chart-card">
             <div class="chart-header">
               <span style="display:flex;align-items:center;gap:6px"><ion-icon name="trending-up-outline"
-                  style="color:var(--success);font-size:16px"></ion-icon> Monthly Revenue vs Collection</span>
-              <span style="font-size:11px;color:#94a3b8;font-weight:400">Nov 2025 – Apr 2026</span>
+                  style="color:var(--success);font-size:16px"></ion-icon> Weekly Revenue vs Collection</span>
+              <span style="font-size:11px;color:#94a3b8;font-weight:400" id="weeklyDateRange">Loading...</span>
             </div>
             <div class="chart-body" style="height:260px">
               <canvas id="revenueChart"></canvas>
@@ -138,8 +138,8 @@
           <div class="chart-card">
             <div class="chart-header">
               <span style="display:flex;align-items:center;gap:6px"><ion-icon name="trending-down-outline"
-                  style="color:var(--danger);font-size:16px"></ion-icon> Order Trend</span>
-              <span style="font-size:11px;color:#94a3b8;font-weight:400">6-month view</span>
+                  style="color:var(--danger);font-size:16px"></ion-icon> Weekly Order Trend</span>
+              <span style="font-size:11px;color:#94a3b8;font-weight:400">Past 7 Days</span>
             </div>
             <div class="chart-body" style="height:260px">
               <canvas id="orderChart"></canvas>
@@ -149,7 +149,7 @@
           <div class="chart-card">
             <div class="chart-header">
               <span style="display:flex;align-items:center;gap:6px"><ion-icon name="pie-chart-outline"
-                  style="color:var(--primary);font-size:16px"></ion-icon> Product Sales Mix</span>
+                  style="color:var(--primary);font-size:16px"></ion-icon> Most Purchased Product</span>
             </div>
             <div class="chart-body" style="height:260px">
               <canvas id="donutChart"></canvas>
