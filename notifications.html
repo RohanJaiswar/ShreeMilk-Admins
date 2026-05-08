@@ -109,12 +109,165 @@
 
       <!-- ═══════════════ CONTENT ═══════════════ -->
       <main class="content">
+        <style>
+            .switch { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+            .switch input { opacity: 0; width: 0; height: 0; }
+            .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 24px; }
+            .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+            input:checked + .slider { background-color: var(--success); }
+            input:checked + .slider:before { transform: translateX(20px); }
+        </style>
+
         <div class="section-title">Notification Center</div>
-        <div class="card" style="padding: 24px; text-align: center; color: var(--text-muted);">
-            <ion-icon name="notifications-outline" style="font-size: 48px; color: var(--border); margin-bottom: 16px;"></ion-icon>
-            <p>No new notifications at this time.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            
+            <!-- Send Custom Notification -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><ion-icon name="paper-plane-outline"></ion-icon> Send Custom Notification</div>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Recipient(s) <span style="color:red">*</span></label>
+                        <select id="notif_recipient" class="form-control" required onchange="document.getElementById('specific_vendor_group').style.display = this.value === 'specific_vendor' ? 'block' : 'none';">
+                            <option value="all_vendors">All Vendors</option>
+                            <option value="all_delivery">All Delivery Partners</option>
+                            <option value="specific_vendor">Specific Vendor...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="specific_vendor_group" style="display: none;">
+                        <label class="form-label">Select Vendor</label>
+                        <select id="notif_vendor_select" class="form-control">
+                            <!-- Populated dynamically if possible, or mocked -->
+                            <option value="">-- Loading vendors --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Notification Title <span style="color:red">*</span></label>
+                        <input type="text" id="notif_title" class="form-control" placeholder="e.g. Holiday Schedule Update" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Message <span style="color:red">*</span></label>
+                        <textarea id="notif_message" class="form-control" rows="4" placeholder="Type your message here..." required></textarea>
+                    </div>
+
+                    <button id="btn_send_notif" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 8px; padding: 12px;" onclick="if(typeof showToast==='function'){showToast('Notification Queued for Sending!', 'success'); document.getElementById('notif_title').value=''; document.getElementById('notif_message').value='';}else{alert('Notification Sent');}">
+                        <ion-icon name="send-outline"></ion-icon> Send Notification
+                    </button>
+                </div>
+            </div>
+
+            <!-- Automated Notifications -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title"><ion-icon name="flash-outline"></ion-icon> Automated Notifications</div>
+                </div>
+                <div class="card-body" style="display: flex; flex-direction: column; gap: 16px;">
+                    <p style="font-size: 13px; color: var(--text-muted);">Enable or disable system-generated alerts sent automatically to vendors or delivery partners.</p>
+                    
+                    <!-- Toggle item 1 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #fafbfc;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #e6f4ff; color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                <ion-icon name="cart-outline"></ion-icon>
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600;">Order Confirmation</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Sent when order is marked 'Processing'</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked onchange="if(typeof showToast==='function') showToast(this.checked ? 'Order Confirmation Alerts Enabled' : 'Order Confirmation Alerts Disabled', 'info')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Toggle item 2 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #fafbfc;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #fff7e6; color: var(--warning); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                <ion-icon name="alert-circle-outline"></ion-icon>
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600;">Payment Overdue Alert</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Sent if outstanding balance is overdue</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" checked onchange="if(typeof showToast==='function') showToast(this.checked ? 'Payment Overdue Alerts Enabled' : 'Payment Overdue Alerts Disabled', 'info')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <!-- Toggle item 3 -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #fafbfc;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 36px; height: 36px; border-radius: 50%; background: #f6ffed; color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                <ion-icon name="bicycle-outline"></ion-icon>
+                            </div>
+                            <div>
+                                <div style="font-size: 13px; font-weight: 600;">Delivery Dispatched</div>
+                                <div style="font-size: 11px; color: var(--text-muted);">Sent when order is 'Dispatched'</div>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" onchange="if(typeof showToast==='function') showToast(this.checked ? 'Delivery Dispatched Alerts Enabled' : 'Delivery Dispatched Alerts Disabled', 'info')">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                </div>
+            </div>
         </div>
-</main><!-- /content -->
+
+        <!-- Notification History -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title"><ion-icon name="time-outline"></ion-icon> Notification Log</div>
+            </div>
+            <div class="card-body" style="padding: 0; overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Date & Time</th>
+                      <th>Title</th>
+                      <th>Recipient</th>
+                      <th>Type</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="notif_table_body">
+                    <tr>
+                      <td style="color: var(--text-muted); font-size: 12px;">08 May 2026, 10:00 AM</td>
+                      <td style="font-weight: 500;">Payment Reminder</td>
+                      <td>Specific Vendor</td>
+                      <td><span class="tag tag-info"><ion-icon name="person-outline"></ion-icon> Manual</span></td>
+                      <td><span class="tag tag-success">Delivered</span></td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-muted); font-size: 12px;">07 May 2026, 04:30 PM</td>
+                      <td style="font-weight: 500;">Order Confirmation #ORD-X19</td>
+                      <td>Store A</td>
+                      <td><span class="tag tag-purple"><ion-icon name="flash-outline"></ion-icon> Auto</span></td>
+                      <td><span class="tag tag-success">Delivered</span></td>
+                    </tr>
+                    <tr>
+                      <td style="color: var(--text-muted); font-size: 12px;">06 May 2026, 09:15 AM</td>
+                      <td style="font-weight: 500;">System Maintenance Alert</td>
+                      <td>All Vendors</td>
+                      <td><span class="tag tag-info"><ion-icon name="person-outline"></ion-icon> Manual</span></td>
+                      <td><span class="tag tag-success">Delivered</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+
+      </main><!-- /content -->
     </div><!-- /main-wrapper -->
   </div><!-- /layout -->
   <!-- Scripts -->

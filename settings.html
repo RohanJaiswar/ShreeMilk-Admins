@@ -46,10 +46,12 @@
             and Reports</span>
         </a>
         <a href="notifications.html" class="nav-item" style="text-decoration: none;">
-          <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span class="nav-label">Notification Center</span>
+          <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span
+            class="nav-label">Notification Center</span>
         </a>
         <a href="app-settings.html" class="nav-item" style="text-decoration: none;">
-          <span class="nav-icon"><ion-icon name="options-outline"></ion-icon></span><span class="nav-label">Application Settings</span>
+          <span class="nav-icon"><ion-icon name="options-outline"></ion-icon></span><span class="nav-label">Application
+            Settings</span>
         </a>
         <a href="settings.html" class="nav-item active" style="text-decoration: none;">
           <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
@@ -197,18 +199,46 @@
                 </div>
 
                 <div class="form-group">
+                  <label class="form-label" style="margin-bottom: 10px; display: block;">
+                    <ion-icon name="cube-outline"
+                      style="vertical-align: -2px; margin-right: 4px; color: var(--primary);"></ion-icon>
+                    Include Container
+                  </label>
+                  <div style="display: flex; gap: 12px;">
+                    <label id="lbl_container_yes" for="p_container_yes"
+                      style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; flex: 1; justify-content: center;">
+                      <input type="radio" id="p_container_yes" name="p_include_container" value="yes"
+                        onchange="document.getElementById('lbl_container_yes').style.borderColor='var(--primary)'; document.getElementById('lbl_container_yes').style.background='rgba(22,119,255,0.08)'; document.getElementById('lbl_container_yes').style.color='var(--primary)'; document.getElementById('lbl_container_no').style.borderColor='var(--border)'; document.getElementById('lbl_container_no').style.background=''; document.getElementById('lbl_container_no').style.color='';"
+                        style="accent-color: var(--primary);" />
+                      <ion-icon name="checkmark-circle-outline" style="font-size:16px;"></ion-icon> Yes
+                    </label>
+                    <label id="lbl_container_no" for="p_container_no"
+                      style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; flex: 1; justify-content: center; border-color: var(--primary); background: rgba(22,119,255,0.08); color: var(--primary);">
+                      <input type="radio" id="p_container_no" name="p_include_container" value="no" checked
+                        onchange="document.getElementById('lbl_container_no').style.borderColor='var(--primary)'; document.getElementById('lbl_container_no').style.background='rgba(22,119,255,0.08)'; document.getElementById('lbl_container_no').style.color='var(--primary)'; document.getElementById('lbl_container_yes').style.borderColor='var(--border)'; document.getElementById('lbl_container_yes').style.background=''; document.getElementById('lbl_container_yes').style.color='';"
+                        style="accent-color: var(--primary);" />
+                      <ion-icon name="close-circle-outline" style="font-size:16px;"></ion-icon> No
+                    </label>
+                  </div>
+                </div>
+
+                <div class="form-group">
                   <label class="form-label">Product Image</label>
-                  <label
+                  <label id="p_image_label"
                     style="display: block; border: 2px dashed var(--border); border-radius: 8px; padding: 24px; text-align: center; cursor: pointer; color: var(--text-muted); background: #fafbfc; transition: var(--transition);"
                     onmouseover="this.style.borderColor='var(--primary)'"
                     onmouseout="this.style.borderColor='var(--border)'">
                     <ion-icon name="cloud-upload-outline"
                       style="font-size: 28px; color: var(--primary); margin-bottom: 8px;"></ion-icon>
-                    <div style="font-size: 13px; font-weight: 500; color: var(--text-primary);">Click to upload product
+                    <div id="p_image_text" style="font-size: 13px; font-weight: 500; color: var(--text-primary);">Click to upload product
                       photo</div>
                     <div style="font-size: 11px; margin-top: 4px;">PNG, JPG up to 5MB</div>
                     <input type="file" id="p_image" style="display: none;" accept="image/*" />
                   </label>
+                  <div id="p_image_preview" style="margin-top: 12px; display: none; text-align: center;">
+                    <img src="" alt="Preview" style="max-width: 100%; max-height: 150px; border-radius: 8px; border: 1px solid var(--border);" />
+                    <div style="font-size: 11px; color: var(--success); margin-top: 4px;">Image selected!</div>
+                  </div>
                 </div>
 
                 <button id="btn_add_product" class="btn btn-primary"
@@ -233,6 +263,7 @@
                       <th>Category</th>
                       <th>Unit</th>
                       <th>Price</th>
+                      <th>Container</th>
                       <th>Action</th>
                     </tr>
                   </thead>

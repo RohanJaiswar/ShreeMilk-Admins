@@ -130,6 +130,9 @@ async function fetchProducts() {
                 ? `<img src="${p.image_url}" alt="${safeName}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);" />`
                 : `<div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><ion-icon name="image-outline"></ion-icon></div>`;
 
+            const includeContainer = p.includes_container === true || p.includes_container === 'yes' ? 'Yes' : 'No';
+            const containerTagClass = includeContainer === 'Yes' ? 'tag-success' : 'tag-info';
+
             rowsHTML += `
             <tr>
               <td>${imageDisplay}</td>
@@ -137,9 +140,10 @@ async function fetchProducts() {
               <td><span class="tag ${tagClass}">${p.category}</span></td>
               <td>${p.unit_weight}</td>
               <td style="font-weight: 600; color: var(--success);">₹ ${parseFloat(p.base_price).toFixed(2)}</td>
+              <td><span class="tag ${containerTagClass}">${includeContainer}</span></td>
               <td>
                 <div style="display: flex; gap: 8px;">
-                    <button class="btn btn-outline btn-sm" style="padding: 6px 12px; font-size: 12px;" onclick="editProduct('${p.id}', '${safeName}', '${p.category}', '${p.unit_weight}', '${p.base_price}')"><ion-icon name="create-outline"></ion-icon> Edit</button>
+                    <button class="btn btn-outline btn-sm" style="padding: 6px 12px; font-size: 12px;" onclick="editProduct('${p.id}', '${safeName}', '${p.category}', '${p.unit_weight}', '${p.base_price}', '${p.includes_container}')"><ion-icon name="create-outline"></ion-icon> Edit</button>
                     <button class="btn btn-danger btn-sm" style="padding: 6px 12px; font-size: 12px;" onclick="deleteProduct('${p.id}', '${safeName}')"><ion-icon name="trash-outline"></ion-icon> Remove</button>
                 </div>
               </td>
@@ -154,7 +158,8 @@ async function fetchProducts() {
     }
 }
 
-window.editProduct = function(id, name, category, weight, price) {
+window.editProduct = function(id, name, category, weight, price, includeContainer) {
+    const isContainer = includeContainer === 'true' || includeContainer === 'yes' || includeContainer === true;
     if (typeof showModal === 'function') {
         const body = `
             <div class="form-group">
@@ -181,8 +186,24 @@ window.editProduct = function(id, name, category, weight, price) {
                 <input type="number" id="edit_p_price" class="form-control" value="${price}" />
             </div>
             <div class="form-group">
+                <label class="form-label" style="margin-bottom: 10px; display: block;">Include Container</label>
+                <div style="display: flex; gap: 12px;">
+                    <label id="edit_lbl_container_yes" for="edit_p_container_yes" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 2px solid ${isContainer ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; flex: 1; justify-content: center; background: ${isContainer ? 'rgba(22,119,255,0.08)' : ''}; color: ${isContainer ? 'var(--primary)' : ''};">
+                        <input type="radio" id="edit_p_container_yes" name="edit_p_include_container" value="yes" ${isContainer ? 'checked' : ''} 
+                            onchange="document.getElementById('edit_lbl_container_yes').style.borderColor='var(--primary)'; document.getElementById('edit_lbl_container_yes').style.background='rgba(22,119,255,0.08)'; document.getElementById('edit_lbl_container_yes').style.color='var(--primary)'; document.getElementById('edit_lbl_container_no').style.borderColor='var(--border)'; document.getElementById('edit_lbl_container_no').style.background=''; document.getElementById('edit_lbl_container_no').style.color='';" style="accent-color: var(--primary);" />
+                        <ion-icon name="checkmark-circle-outline" style="font-size:16px;"></ion-icon> Yes
+                    </label>
+                    <label id="edit_lbl_container_no" for="edit_p_container_no" style="display: flex; align-items: center; gap: 8px; padding: 10px 18px; border: 2px solid ${!isContainer ? 'var(--primary)' : 'var(--border)'}; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s; flex: 1; justify-content: center; background: ${!isContainer ? 'rgba(22,119,255,0.08)' : ''}; color: ${!isContainer ? 'var(--primary)' : ''};">
+                        <input type="radio" id="edit_p_container_no" name="edit_p_include_container" value="no" ${!isContainer ? 'checked' : ''} 
+                            onchange="document.getElementById('edit_lbl_container_no').style.borderColor='var(--primary)'; document.getElementById('edit_lbl_container_no').style.background='rgba(22,119,255,0.08)'; document.getElementById('edit_lbl_container_no').style.color='var(--primary)'; document.getElementById('edit_lbl_container_yes').style.borderColor='var(--border)'; document.getElementById('edit_lbl_container_yes').style.background=''; document.getElementById('edit_lbl_container_yes').style.color='';" style="accent-color: var(--primary);" />
+                        <ion-icon name="close-circle-outline" style="font-size:16px;"></ion-icon> No
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
                 <label class="form-label">Update Image (Optional)</label>
-                <input type="file" id="edit_p_image" class="form-control" accept="image/*" />
+                <input type="file" id="edit_p_image" class="form-control" accept="image/*" onchange="const txt = document.getElementById('edit_p_image_info'); if(txt && this.files[0]) txt.innerText = '✓ ' + this.files[0].name; if(txt && this.files[0]) txt.style.color = 'var(--success)';" />
+                <div id="edit_p_image_info" style="font-size: 11px; margin-top: 4px; color: var(--text-muted);">Current image will be kept if none selected</div>
             </div>
         `;
         
@@ -232,11 +253,14 @@ window.editProduct = function(id, name, category, weight, price) {
                             }
                         }
 
+                        const newIncludeContainer = document.querySelector('input[name="edit_p_include_container"]:checked')?.value === 'yes';
+
                         const updateData = {
                             product_name: newName,
                             category: newCat,
                             unit_weight: newWeight,
-                            base_price: parseFloat(newPrice)
+                            base_price: parseFloat(newPrice),
+                            includes_container: newIncludeContainer
                         };
 
                         if (newImageUrl) {
@@ -1330,6 +1354,7 @@ function initSupabaseForms() {
             const category = document.getElementById('p_category')?.value;
             const weight = document.getElementById('p_weight')?.value;
             const price = document.getElementById('p_price')?.value;
+            const includeContainer = document.querySelector('input[name="p_include_container"]:checked')?.value === 'yes';
             const imageFile = document.getElementById('p_image')?.files[0];
 
             // Basic validation
@@ -1379,7 +1404,8 @@ function initSupabaseForms() {
                             category: category, 
                             unit_weight: weight, 
                             base_price: parseFloat(price),
-                            image_url: image_url
+                            image_url: image_url,
+                            includes_container: includeContainer
                         }
                     ]);
 
@@ -1392,7 +1418,15 @@ function initSupabaseForms() {
                 document.getElementById('p_name').value = '';
                 document.getElementById('p_weight').value = '';
                 document.getElementById('p_price').value = '';
-                if(document.getElementById('p_image')) document.getElementById('p_image').value = '';
+                if(document.getElementById('p_image')) {
+                    document.getElementById('p_image').value = '';
+                    const preview = document.getElementById('p_image_preview');
+                    if(preview) preview.style.display = 'none';
+                    const text = document.getElementById('p_image_text');
+                    if(text) text.innerText = 'Click to upload product photo';
+                    const label = document.getElementById('p_image_label');
+                    if(label) label.style.borderColor = 'var(--border)';
+                }
 
                 // Refresh the table
                 fetchProducts();
@@ -1406,6 +1440,143 @@ function initSupabaseForms() {
                 btnAddProduct.disabled = false;
             }
         });
+    }
+
+    // --- Image Preview Listener ---
+    const pImageInput = document.getElementById('p_image');
+    if (pImageInput) {
+        pImageInput.addEventListener('change', function() {
+            const preview = document.getElementById('p_image_preview');
+            const previewImg = preview?.querySelector('img');
+            const text = document.getElementById('p_image_text');
+            const label = document.getElementById('p_image_label');
+            
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if(previewImg) previewImg.src = e.target.result;
+                    if(preview) preview.style.display = 'block';
+                    if(text) text.innerText = 'Image selected: ' + pImageInput.files[0].name;
+                    if(label) label.style.borderColor = 'var(--success)';
+                }
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                if(preview) preview.style.display = 'none';
+                if(text) text.innerText = 'Click to upload product photo';
+                if(label) label.style.borderColor = 'var(--border)';
+            }
+        });
+    }
+    // --- Notification Center Logic ---
+    const notifTableBody = document.getElementById('notif_table_body');
+    if (notifTableBody) {
+        fetchNotifications();
+        
+        // Populate vendor select if it exists
+        const notifVendorSelect = document.getElementById('notif_vendor_select');
+        if (notifVendorSelect) {
+            supabaseClient.from('vendors').select('id, store_name, username').order('store_name').then(({ data, error }) => {
+                if (!error && data) {
+                    notifVendorSelect.innerHTML = '<option value="">-- Select Vendor --</option>' + 
+                        data.map(v => `<option value="${v.id}">${v.store_name || v.username}</option>`).join('');
+                }
+            });
+        }
+
+        // Send Button Listener
+        const btnSendNotif = document.getElementById('btn_send_notif');
+        if (btnSendNotif) {
+            btnSendNotif.onclick = async () => {
+                const recipientType = document.getElementById('notif_recipient').value;
+                const specificVendorId = document.getElementById('notif_vendor_select').value;
+                const title = document.getElementById('notif_title').value;
+                const message = document.getElementById('notif_message').value;
+
+                if (!title || !message) {
+                    alert('Please fill in title and message.');
+                    return;
+                }
+
+                if (recipientType === 'specific_vendor' && !specificVendorId) {
+                    alert('Please select a vendor.');
+                    return;
+                }
+
+                const originalText = btnSendNotif.innerHTML;
+                btnSendNotif.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite; margin-right: 8px;"></ion-icon> Sending...';
+                btnSendNotif.disabled = true;
+
+                try {
+                    const notifData = {
+                        title,
+                        message,
+                        recipient_type: recipientType,
+                        vendor_id: recipientType === 'specific_vendor' ? specificVendorId : null,
+                        type: 'Manual',
+                        status: 'Sent'
+                    };
+
+                    const { error } = await supabaseClient.from('notifications').insert([notifData]);
+                    if (error) throw error;
+
+                    if (typeof showToast === 'function') showToast('Notification sent successfully!', 'success');
+                    else alert('✅ Notification sent!');
+
+                    // Reset form
+                    document.getElementById('notif_title').value = '';
+                    document.getElementById('notif_message').value = '';
+                    fetchNotifications();
+                } catch (err) {
+                    console.error("Error sending notification:", err);
+                    alert('❌ Error: ' + err.message);
+                } finally {
+                    btnSendNotif.innerHTML = originalText;
+                    btnSendNotif.disabled = false;
+                }
+            };
+        }
+    }
+}
+
+async function fetchNotifications() {
+    const tableBody = document.getElementById('notif_table_body');
+    if (!tableBody) return;
+
+    try {
+        const { data, error } = await supabaseClient
+            .from('notifications')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(20);
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+            // Keep default static rows or show empty message
+            return;
+        }
+
+        tableBody.innerHTML = data.map(n => {
+            const date = new Date(n.created_at).toLocaleString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+            const typeClass = n.type === 'Auto' ? 'tag-purple' : 'tag-info';
+            const typeIcon = n.type === 'Auto' ? 'flash-outline' : 'person-outline';
+            
+            let recipient = n.recipient_type === 'all_vendors' ? 'All Vendors' : 
+                            n.recipient_type === 'all_delivery' ? 'All Delivery Partners' : 'Specific Vendor';
+            
+            return `
+                <tr>
+                  <td style="color: var(--text-muted); font-size: 12px;">${date}</td>
+                  <td style="font-weight: 500;">${n.title}</td>
+                  <td>${recipient}</td>
+                  <td><span class="tag ${typeClass}"><ion-icon name="${typeIcon}"></ion-icon> ${n.type}</span></td>
+                  <td><span class="tag tag-success">${n.status || 'Delivered'}</span></td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (err) {
+        console.error("Error fetching notifications:", err);
     }
 }
 
