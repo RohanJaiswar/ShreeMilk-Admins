@@ -124,14 +124,25 @@ async function fetchProducts() {
             if (p.category.toLowerCase().includes('paneer')) tagClass = "tag-warning";
             else if (p.category.toLowerCase().includes('by-product')) tagClass = "tag-purple";
 
+            const safeName = p.product_name.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            
+            const imageDisplay = p.image_url 
+                ? `<img src="${p.image_url}" alt="${safeName}" style="width: 40px; height: 40px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border);" />`
+                : `<div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><ion-icon name="image-outline"></ion-icon></div>`;
+
             rowsHTML += `
             <tr>
-              <td><div style="width: 40px; height: 40px; background: #e2e8f0; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #94a3b8;"><ion-icon name="image-outline"></ion-icon></div></td>
+              <td>${imageDisplay}</td>
               <td style="font-weight: 600;">${p.product_name}</td>
               <td><span class="tag ${tagClass}">${p.category}</span></td>
               <td>${p.unit_weight}</td>
               <td style="font-weight: 600; color: var(--success);">₹ ${parseFloat(p.base_price).toFixed(2)}</td>
-              <td><button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="alert('Delete functionality coming soon!')"><ion-icon name="trash-outline"></ion-icon> Remove</button></td>
+              <td>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-outline btn-sm" style="padding: 6px 12px; font-size: 12px;" onclick="editProduct('${p.id}', '${safeName}', '${p.category}', '${p.unit_weight}', '${p.base_price}')"><ion-icon name="create-outline"></ion-icon> Edit</button>
+                    <button class="btn btn-danger btn-sm" style="padding: 6px 12px; font-size: 12px;" onclick="deleteProduct('${p.id}', '${safeName}')"><ion-icon name="trash-outline"></ion-icon> Remove</button>
+                </div>
+              </td>
             </tr>`;
         });
 
@@ -142,6 +153,166 @@ async function fetchProducts() {
         tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--danger);">Error loading products.</td></tr>`;
     }
 }
+
+window.editProduct = function(id, name, category, weight, price) {
+    if (typeof showModal === 'function') {
+        const body = `
+            <div class="form-group">
+                <label class="form-label">Product Name</label>
+                <input type="text" id="edit_p_name" class="form-control" value="${name}" />
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select id="edit_p_category" class="form-control">
+                        <option ${category === 'Milk' ? 'selected' : ''}>Milk</option>
+                        <option ${category === 'Paneer' ? 'selected' : ''}>Paneer</option>
+                        <option ${category === 'Curd/Dahi' ? 'selected' : ''}>Curd/Dahi</option>
+                        <option ${category === 'By-products' ? 'selected' : ''}>By-products</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Unit Weight</label>
+                    <input type="text" id="edit_p_weight" class="form-control" value="${weight}" />
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Base Price (₹)</label>
+                <input type="number" id="edit_p_price" class="form-control" value="${price}" />
+            </div>
+            <div class="form-group">
+                <label class="form-label">Update Image (Optional)</label>
+                <input type="file" id="edit_p_image" class="form-control" accept="image/*" />
+            </div>
+        `;
+        
+        showModal('Edit Product', body, [
+            {
+                label: 'Save Changes',
+                cls: 'btn-primary',
+                action: async () => {
+                    const newName = document.getElementById('edit_p_name').value;
+                    const newCat = document.getElementById('edit_p_category').value;
+                    const newWeight = document.getElementById('edit_p_weight').value;
+                    const newPrice = document.getElementById('edit_p_price').value;
+                    const imageFile = document.getElementById('edit_p_image')?.files[0];
+                    
+                    if (!newName || !newWeight || !newPrice) {
+                        alert('Please fill all mandatory fields');
+                        return;
+                    }
+                    
+                    const btnRow = document.getElementById('_modalBtnRow');
+                    if(btnRow) {
+                        btnRow.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite; margin-right: 8px;"></ion-icon> Saving...';
+                    }
+                    
+                    try {
+                        let newImageUrl = null;
+                        
+                        if (imageFile) {
+                            const fileExt = imageFile.name.split('.').pop();
+                            const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                            
+                            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                                .from('product-images')
+                                .upload(fileName, imageFile, { cacheControl: '3600', upsert: false });
+
+                            if (uploadError) {
+                                console.error("Image upload error:", uploadError);
+                                alert("Image upload failed: " + uploadError.message);
+                                throw uploadError;
+                            }
+
+                            if (uploadData) {
+                                const { data: publicUrlData } = supabaseClient.storage
+                                    .from('product-images')
+                                    .getPublicUrl(fileName);
+                                newImageUrl = publicUrlData?.publicUrl || null;
+                            }
+                        }
+
+                        const updateData = {
+                            product_name: newName,
+                            category: newCat,
+                            unit_weight: newWeight,
+                            base_price: parseFloat(newPrice)
+                        };
+
+                        if (newImageUrl) {
+                            updateData.image_url = newImageUrl;
+                        }
+
+                        const { error } = await supabaseClient.from('products').update(updateData).eq('id', id);
+                        
+                        if (error) throw error;
+                        
+                        if (typeof showToast === 'function') showToast('Product updated successfully!', 'success');
+                        else alert('Product updated successfully!');
+                        
+                        closeModal();
+                        fetchProducts();
+                    } catch (err) {
+                        console.error('Update Error:', err);
+                        alert('Failed to update product: ' + err.message);
+                        closeModal();
+                    }
+                }
+            },
+            {
+                label: 'Cancel',
+                cls: 'btn-outline',
+                action: closeModal
+            }
+        ]);
+    }
+};
+
+window.deleteProduct = function(id, name) {
+    if (typeof showModal === 'function') {
+        showModal('Confirm Deletion', `<p>Are you sure you want to remove <strong>${name}</strong>?</p><p style="font-size: 13px; color: var(--text-muted); margin-top: 8px;">This action cannot be undone.</p>`, [
+            {
+                label: 'Yes, Remove Product',
+                cls: 'btn-danger',
+                action: async () => {
+                    const btnRow = document.getElementById('_modalBtnRow');
+                    if(btnRow) {
+                        btnRow.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite; margin-right: 8px;"></ion-icon> Deleting...';
+                    }
+                    try {
+                        const { error } = await supabaseClient.from('products').delete().eq('id', id);
+                        if (error) throw error;
+                        
+                        if (typeof showToast === 'function') showToast('Product deleted!', 'success');
+                        else alert('Product deleted!');
+                        
+                        closeModal();
+                        fetchProducts();
+                    } catch (err) {
+                        console.error('Delete Error:', err);
+                        alert('Failed to delete product: ' + err.message);
+                        closeModal();
+                    }
+                }
+            },
+            {
+                label: 'Cancel',
+                cls: 'btn-outline',
+                action: closeModal
+            }
+        ]);
+    } else {
+        if(confirm(`Are you sure you want to remove ${name}?`)) {
+            supabaseClient.from('products').delete().eq('id', id).then(({error}) => {
+                if(error) alert('Failed to delete product: ' + error.message);
+                else {
+                    alert('Product deleted!');
+                    fetchProducts();
+                }
+            });
+        }
+    }
+};
 
 // =========================================================================
 // TRANSACTIONS MODULE
@@ -158,7 +329,7 @@ async function fetchTransactions() {
         // Fetch vendors to populate dropdown and for summary stats
         const { data: vendors, error: vError } = await supabaseClient
             .from('vendors')
-            .select('id, store_name, username, outstanding_balance');
+            .select('*');
             
         if (!vError && vendors) {
             _allVendorsTx = vendors;
@@ -248,12 +419,21 @@ function applyTransactionFilters() {
     if (vendorId && summaryCard) {
         const vendor = _allVendorsTx.find(v => v.id === vendorId);
         
+        // Populate Profile Details
+        if (vendor) {
+            const vendorName = vendor.store_name || vendor.username || 'Unknown Vendor';
+            document.getElementById('summaryName').innerText = vendorName;
+            document.getElementById('summaryAvatar').innerText = vendorName.charAt(0).toUpperCase();
+            document.getElementById('summaryPhone').innerText = vendor.phone_number || 'Not Provided';
+            document.getElementById('summaryAddress').innerText = vendor.address ? `${vendor.address} (${vendor.zone || 'No Zone'})` : (vendor.zone || 'Not Provided');
+        }
+        
         // Outstanding Dues
         const dues = vendor?.outstanding_balance || 0;
         document.getElementById('summaryDues').innerText = '₹ ' + parseFloat(dues).toLocaleString('en-IN');
         
-        // Outstanding Containers (Mocked deterministic based on vendor id string length)
-        const mockContainers = vendor ? (vendor.id.charCodeAt(0) % 15) : 0;
+        // Outstanding Containers (real from database if available, else mocked)
+        const mockContainers = vendor ? (vendor.containers_balance !== undefined ? vendor.containers_balance : (vendor.id.charCodeAt(0) % 15)) : 0;
         document.getElementById('summaryContainers').innerText = mockContainers;
         
         // Total Paid (Calculated from transactions)
@@ -261,6 +441,17 @@ function applyTransactionFilters() {
         const totalPaid = vendorTxns.reduce((sum, t) => sum + parseFloat(t.amount || 0), 0);
         document.getElementById('summaryPaid').innerText = '₹ ' + totalPaid.toLocaleString('en-IN');
         
+        // Fetch Total Orders for Vendor
+        const ordersEl = document.getElementById('summaryOrders');
+        if (ordersEl) {
+            ordersEl.innerText = '...';
+            supabaseClient.from('orders').select('id', { count: 'exact', head: true }).eq('vendor_id', vendorId)
+                .then(({ count, error }) => {
+                    if (!error) ordersEl.innerText = count || 0;
+                    else ordersEl.innerText = '0';
+                });
+        }
+
         summaryCard.style.display = 'block';
     } else if (summaryCard) {
         summaryCard.style.display = 'none';
@@ -285,7 +476,7 @@ function renderTransactionsTable(transactions) {
     if (!tableBody) return;
 
     if (!transactions || transactions.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">No transactions found.</td></tr>';
+        tableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 24px; color: var(--text-muted);">No transactions found.</td></tr>';
         return;
     }
 
@@ -293,8 +484,9 @@ function renderTransactionsTable(transactions) {
     transactions.forEach(t => {
         const date = new Date(t.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
         const txnId = t.transaction_ref || (t.id ? t.id.substring(0, 8).toUpperCase() : 'N/A');
-        const entityName = t.vendor_name || t.delivery_partner_name || '—';
+        const entityName = t.vendor_name || '—';
         const amount = parseFloat(t.amount || 0).toLocaleString('en-IN');
+        const collectedBy = t.delivery_partner_name || 'Admin';
         
         let paymentIcon = 'wallet-outline';
         let tagClass = 'tag-info';
@@ -320,6 +512,7 @@ function renderTransactionsTable(transactions) {
             <td style="font-weight: 500;">${entityName}</td>
             <td style="font-weight: 600;">₹ ${amount}</td>
             <td><span class="tag ${tagClass}"><ion-icon name="${paymentIcon}"></ion-icon> ${paymentModeDisplay}</span></td>
+            <td><span style="font-size:13px; color:var(--text-main); font-weight: 500;"><ion-icon name="person-outline" style="vertical-align:-2px;margin-right:4px;color:var(--text-muted);"></ion-icon>${collectedBy}</span></td>
             <td><span class="tag tag-success">Completed</span></td>
           </tr>
         `;
@@ -1000,69 +1193,58 @@ function initSupabaseForms() {
     }
 
     /* ----------------------------------------------------------------------
-     * ADD NEW VENDOR LOGIC
+     * ADD NEW PACKER LOGIC
      * ---------------------------------------------------------------------- */
-    const btnAddVendor = document.getElementById('btn_add_vendor');
-    if (btnAddVendor) {
-        btnAddVendor.addEventListener('click', async (e) => {
+    const btnAddPacker = document.getElementById('btn_add_packer');
+    if (btnAddPacker) {
+        btnAddPacker.addEventListener('click', async (e) => {
             e.preventDefault();
 
             // Gather values
-            const storeName = document.getElementById('v_store_name')?.value;
-            const phone = document.getElementById('v_phone')?.value;
-            const zone = document.getElementById('v_zone')?.value;
-            const username = document.getElementById('v_username')?.value;
-            const password = document.getElementById('v_password')?.value;
-            const address = document.getElementById('v_address')?.value;
+            const name = document.getElementById('pack_name')?.value;
+            const email = document.getElementById('pack_email')?.value;
+            const password = document.getElementById('pack_password')?.value;
 
             // Basic validation
-            if (!storeName || !phone || !username || !password) {
-                alert('Please fill in all mandatory fields (Store Name, Phone, Username, Password).');
+            if (!name || !email || !password) {
+                alert('Please fill in all mandatory fields (Name, Email, Password).');
                 return;
             }
 
             // Visual feedback
-            const originalText = btnAddVendor.innerHTML;
-            btnAddVendor.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite;"></ion-icon> Saving...';
-            btnAddVendor.disabled = true;
+            const originalText = btnAddPacker.innerHTML;
+            btnAddPacker.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite;"></ion-icon> Saving...';
+            btnAddPacker.disabled = true;
 
             try {
-                // Insert into Supabase (Testing phase: password stored in plain text)
+                // Insert into Supabase 
                 const { data, error } = await supabaseClient
-                    .from('vendors')
+                    .from('packers')
                     .insert([
                         { 
-                            store_name: storeName, 
-                            phone_number: phone, 
-                            zone: zone, 
-                            username: username, 
-                            password: password, 
-                            address: address 
+                            name: name, 
+                            email: email, 
+                            password: password 
                         }
                     ]);
 
                 if (error) throw error;
 
                 // Success Message
-                alert('✅ Vendor successfully created in database!');
+                alert('✅ Packer successfully created in database!');
                 
                 // Clear Form
-                document.getElementById('v_store_name').value = '';
-                document.getElementById('v_phone').value = '';
-                document.getElementById('v_username').value = '';
-                document.getElementById('v_password').value = '';
-                document.getElementById('v_address').value = '';
-
-                // Refresh the table
-                fetchDirectory();
+                document.getElementById('pack_name').value = '';
+                document.getElementById('pack_email').value = '';
+                document.getElementById('pack_password').value = '';
 
             } catch (err) {
-                console.error("Error inserting vendor:", err);
-                alert('❌ Error creating vendor: ' + (err.message || "Check console for details."));
+                console.error("Error inserting packer:", err);
+                alert('❌ Error creating packer: ' + (err.message || "Check console for details."));
             } finally {
                 // Restore button
-                btnAddVendor.innerHTML = originalText;
-                btnAddVendor.disabled = false;
+                btnAddPacker.innerHTML = originalText;
+                btnAddPacker.disabled = false;
             }
         });
     }
@@ -1148,6 +1330,7 @@ function initSupabaseForms() {
             const category = document.getElementById('p_category')?.value;
             const weight = document.getElementById('p_weight')?.value;
             const price = document.getElementById('p_price')?.value;
+            const imageFile = document.getElementById('p_image')?.files[0];
 
             // Basic validation
             if (!name || !category || !weight || !price) {
@@ -1157,11 +1340,37 @@ function initSupabaseForms() {
 
             // Visual feedback
             const originalText = btnAddProduct.innerHTML;
-            btnAddProduct.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite;"></ion-icon> Saving...';
+            btnAddProduct.innerHTML = '<ion-icon name="sync-outline" style="animation: spin 1s linear infinite; margin-right: 8px;"></ion-icon> Saving...';
             btnAddProduct.disabled = true;
 
             try {
-                // Insert into Supabase
+                let image_url = null;
+                
+                // 1. Upload Image to Supabase Storage (if selected)
+                if (imageFile) {
+                    const fileExt = imageFile.name.split('.').pop();
+                    const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('product-images')
+                        .upload(fileName, imageFile, { cacheControl: '3600', upsert: false });
+
+                    if (uploadError) {
+                        console.error("Image upload error:", uploadError);
+                        alert("Image upload failed. Make sure the 'product-images' storage bucket exists and is public.");
+                        throw uploadError;
+                    }
+
+                    // Get Public URL
+                    if (uploadData) {
+                        const { data: publicUrlData } = supabaseClient.storage
+                            .from('product-images')
+                            .getPublicUrl(fileName);
+                        image_url = publicUrlData?.publicUrl || null;
+                    }
+                }
+
+                // 2. Insert into Supabase Database
                 const { data, error } = await supabaseClient
                     .from('products')
                     .insert([
@@ -1169,7 +1378,8 @@ function initSupabaseForms() {
                             product_name: name, 
                             category: category, 
                             unit_weight: weight, 
-                            base_price: parseFloat(price)
+                            base_price: parseFloat(price),
+                            image_url: image_url
                         }
                     ]);
 
@@ -1182,6 +1392,7 @@ function initSupabaseForms() {
                 document.getElementById('p_name').value = '';
                 document.getElementById('p_weight').value = '';
                 document.getElementById('p_price').value = '';
+                if(document.getElementById('p_image')) document.getElementById('p_image').value = '';
 
                 // Refresh the table
                 fetchProducts();

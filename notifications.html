@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shreeji Milk Center — Analytics</title>
+  <title>Shreeji Milk Center — Notification Center</title>
   <meta name="description"
     content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -33,10 +33,6 @@
           <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span
             class="nav-label">Dashboard</span>
         </a>
-        <a href="analytics.html" class="nav-item active" style="text-decoration: none;">
-          <span class="nav-icon"><ion-icon name="bar-chart-outline"></ion-icon></span><span
-            class="nav-label">Analytics</span>
-        </a>
         <a href="delivery.html" class="nav-item" style="text-decoration: none;">
           <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery &
             Orders</span>
@@ -49,7 +45,7 @@
           <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
             and Reports</span>
         </a>
-        <a href="notifications.html" class="nav-item" style="text-decoration: none;">
+        <a href="notifications.html" class="nav-item active" style="text-decoration: none;">
           <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span class="nav-label">Notification Center</span>
         </a>
         <a href="app-settings.html" class="nav-item" style="text-decoration: none;">
@@ -70,7 +66,7 @@
         <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon
             name="menu-outline"></ion-icon></button>
         <div class="header-breadcrumb">
-          Dashboard &rsaquo; <span>Analytics</span>
+          Dashboard &rsaquo; <span>Notification Center</span>
         </div>
         <div class="header-right">
           <!-- Brand Logo in Top Right -->
@@ -113,23 +109,17 @@
 
       <!-- ═══════════════ CONTENT ═══════════════ -->
       <main class="content">
-        <div class="section-title">Analytics</div>
-
-        <div class="card">
-          <div class="card-body"
-            style="min-height: 400px; display: flex; align-items: center; justify-content: center; flex-direction: column; color: var(--text-muted);">
-            <div style="font-size: 64px; margin-bottom: 16px; color: var(--primary)"><ion-icon
-                name="bar-chart-outline"></ion-icon></div>
-            <h2>Analytics Module</h2>
-            <p>This page will be designed later.</p>
-          </div>
+        <div class="section-title">Notification Center</div>
+        <div class="card" style="padding: 24px; text-align: center; color: var(--text-muted);">
+            <ion-icon name="notifications-outline" style="font-size: 48px; color: var(--border); margin-bottom: 16px;"></ion-icon>
+            <p>No new notifications at this time.</p>
         </div>
-
-      </main><!-- /content -->
+</main><!-- /content -->
     </div><!-- /main-wrapper -->
   </div><!-- /layout -->
-
   <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-integration.js"></script>
   <script src="js/app.js"></script>
 
 </body>

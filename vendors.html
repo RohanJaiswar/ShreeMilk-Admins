@@ -45,6 +45,12 @@
           <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
             and Reports</span>
         </a>
+        <a href="notifications.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span class="nav-label">Notification Center</span>
+        </a>
+        <a href="app-settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="options-outline"></ion-icon></span><span class="nav-label">Application Settings</span>
+        </a>
         <a href="settings.html" class="nav-item" style="text-decoration: none;">
           <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
             class="nav-label">Settings</span>
@@ -279,71 +285,41 @@
         <div class="section-title" style="margin-top: 32px; font-size: 18px;">Onboarding</div>
         <div
           style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 24px;">
-          <!-- Add Vendor Card -->
+          <!-- Add Packer Card -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title"><ion-icon name="storefront-outline"></ion-icon> Add New Vendor</div>
+              <div class="card-title"><ion-icon name="person-circle-outline"></ion-icon> Add New Packer</div>
             </div>
             <div class="card-body" style="padding: 24px;">
-              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Register a new retail shop to
-                supply dairy products.</p>
+              <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Register a new packer. Packers can only fetch orders, dates, and items without pricing or delivery details.</p>
               <div class="form-group">
-                <label class="form-label">Store Name</label>
+                <label class="form-label">Name of Packer</label>
                 <div class="input-with-icon">
-                  <ion-icon name="business-outline"></ion-icon>
-                  <input type="text" id="v_store_name" class="form-control" placeholder="e.g. Ramesh Dairy" />
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Phone Number</label>
-                  <div class="input-with-icon">
-                    <ion-icon name="call-outline"></ion-icon>
-                    <input type="tel" id="v_phone" class="form-control" placeholder="+91" />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Zone</label>
-                  <div class="input-with-icon">
-                    <ion-icon name="map-outline"></ion-icon>
-                    <select id="v_zone" class="form-control">
-                      <option>Zone A (North)</option>
-                      <option>Zone B (Central)</option>
-                      <option>Zone C (South)</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div class="form-row">
-                <div class="form-group">
-                  <label class="form-label">Username</label>
-                  <div class="input-with-icon">
-                    <ion-icon name="at-outline"></ion-icon>
-                    <input type="text" id="v_username" class="form-control" placeholder="vendor_username" />
-                  </div>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Password</label>
-                  <div class="input-with-icon">
-                    <ion-icon name="lock-closed-outline"></ion-icon>
-                    <input type="password" id="v_password" class="form-control" placeholder="••••••••" />
-                  </div>
+                  <ion-icon name="person-outline"></ion-icon>
+                  <input type="text" id="pack_name" class="form-control" placeholder="e.g. Anil Kumar" />
                 </div>
               </div>
               <div class="form-group">
-                <label class="form-label">Address</label>
-                <div class="input-with-icon" style="align-items: flex-start;">
-                  <ion-icon name="location-outline" style="top: 12px;"></ion-icon>
-                  <textarea id="v_address" class="form-control" rows="3" placeholder="Full store address..."></textarea>
+                <label class="form-label">Email Address</label>
+                <div class="input-with-icon">
+                  <ion-icon name="mail-outline"></ion-icon>
+                  <input type="email" id="pack_email" class="form-control" placeholder="packer@shreejimilk.com" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Static Password</label>
+                <div class="input-with-icon">
+                  <ion-icon name="lock-closed-outline"></ion-icon>
+                  <input type="text" id="pack_password" class="form-control" placeholder="e.g. Packer@123" />
                 </div>
               </div>
               <div
                 style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px; display: flex; align-items: center; gap: 4px;">
                 <ion-icon name="information-circle-outline"></ion-icon> Credentials will be saved to Supabase securely.
               </div>
-              <button id="btn_add_vendor" class="btn btn-primary"
+              <button id="btn_add_packer" class="btn btn-primary"
                 style="width: 100%; justify-content: center; padding: 12px; font-size: 14px;"><ion-icon
-                  name="add-circle-outline"></ion-icon> Register Vendor</button>
+                  name="add-circle-outline"></ion-icon> Register Packer</button>
             </div>
           </div>
 

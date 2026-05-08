@@ -45,6 +45,12 @@
           <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
             and Reports</span>
         </a>
+        <a href="notifications.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span class="nav-label">Notification Center</span>
+        </a>
+        <a href="app-settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="options-outline"></ion-icon></span><span class="nav-label">Application Settings</span>
+        </a>
         <a href="settings.html" class="nav-item" style="text-decoration: none;">
           <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
             class="nav-label">Settings</span>
@@ -111,85 +117,220 @@
         </div>
 
         <!-- Vendor Selection Area -->
-        <div class="card" style="margin-bottom: 24px;">
-          <div class="card-body" style="display: flex; flex-direction: column; gap: 16px; padding: 20px;">
+        <div class="card" style="margin-bottom: 24px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+          <div class="card-body" style="display: flex; flex-direction: column; gap: 20px; padding: 24px;">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
-                <div style="font-size: 16px; font-weight: 600; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                    <ion-icon name="people-outline" style="color: var(--primary); font-size: 20px;"></ion-icon> Vendor Overview
+                <div style="font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 10px; background: #f0f7f3; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+                        <ion-icon name="people" style="font-size: 20px;"></ion-icon>
+                    </div>
+                    Vendor Overview
                 </div>
                 <div class="input-with-icon" style="flex: 1; max-width: 350px;">
-                    <ion-icon name="search-outline"></ion-icon>
-                    <input type="text" id="vendorSearchInput" class="form-control" placeholder="Search vendor by name..." style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+                    <ion-icon name="search"></ion-icon>
+                    <input type="text" id="vendorSearchInput" class="form-control" placeholder="Search vendor by name..." style="padding: 12px 16px 12px 42px; font-size: 14px; border-radius: 12px; background: #f8f9fa; border: 1px solid var(--border);" />
                 </div>
             </div>
             
-            <div id="vendorChipsContainer" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: thin;">
-                <button class="vendor-chip active" data-id="" onclick="window.selectVendor('')" style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--primary); background: var(--primary); color: white; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 500; transition: all 0.2s;">
+            <div id="vendorChipsContainer" style="display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;">
+                <button class="vendor-chip active" data-id="" onclick="window.selectVendor('')" style="padding: 10px 20px; border-radius: 24px; border: 1px solid var(--primary); background: var(--primary); color: white; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 500; transition: all 0.2s; box-shadow: 0 4px 12px rgba(34, 139, 34, 0.25);">
                     All Vendors
                 </button>
                 <!-- Vendor chips dynamically added here -->
             </div>
+            <style>
+                #vendorChipsContainer::-webkit-scrollbar { display: none; }
+            </style>
           </div>
         </div>
 
-        <!-- Vendor Summary Card (Hidden by default) -->
+        <!-- Vendor Profile & Summary Card (Hidden by default) -->
         <div id="vendorSummaryCard" style="display: none; margin-bottom: 24px;">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
-                <div class="card" style="padding: 16px; border-left: 4px solid var(--danger);">
-                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                        <ion-icon name="wallet-outline"></ion-icon> Outstanding Dues
+            <div class="card" style="padding: 24px; border-radius: 16px; background: #ffffff; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div id="vendorSummaryContainer" style="display: grid; grid-template-columns: 320px 1fr; gap: 32px;">
+                    <!-- Profile Section -->
+                    <div style="display: flex; align-items: flex-start; gap: 16px; border-right: 1px solid var(--border); padding-right: 24px;" id="profileSectionBorder">
+                        <div id="summaryAvatar" style="width: 72px; height: 72px; border-radius: 16px; background: linear-gradient(135deg, var(--primary), #1a4f31); color: white; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 700; flex-shrink: 0; box-shadow: 0 4px 12px rgba(34, 139, 34, 0.2);">
+                            V
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 id="summaryName" style="margin: 0 0 6px 0; font-size: 20px; font-weight: 700; color: var(--text-main);">Vendor Name</h3>
+                            <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span class="tag tag-success" style="font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 6px;">Active Partner</span>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: var(--text-secondary);">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f0f7f3; display: flex; align-items: center; justify-content: center; color: var(--primary);">
+                                        <ion-icon name="call"></ion-icon> 
+                                    </div>
+                                    <span id="summaryPhone" style="font-weight: 500;">Not Provided</span>
+                                </div>
+                                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 8px; background: #f0f7f3; display: flex; align-items: center; justify-content: center; color: var(--primary); flex-shrink: 0;">
+                                        <ion-icon name="location"></ion-icon> 
+                                    </div>
+                                    <span id="summaryAddress" style="font-weight: 500; line-height: 1.4;">Not Provided</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="summaryDues" style="font-size: 24px; font-weight: 700; color: var(--danger);">₹ 0</div>
-                </div>
-                <div class="card" style="padding: 16px; border-left: 4px solid var(--warning);">
-                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                        <ion-icon name="cube-outline"></ion-icon> Outstanding Containers
+                    
+                    <!-- Stats Section -->
+                    <div id="statsSectionGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: center;">
+                        <div class="stat-card stat-danger">
+                            <div class="stat-icon"><ion-icon name="wallet"></ion-icon></div>
+                            <div class="stat-content">
+                                <div class="stat-label">Outstanding Dues</div>
+                                <div id="summaryDues" class="stat-value">₹ 0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-warning">
+                            <div class="stat-icon"><ion-icon name="cube"></ion-icon></div>
+                            <div class="stat-content">
+                                <div class="stat-label">Containers Due</div>
+                                <div id="summaryContainers" class="stat-value">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-success">
+                            <div class="stat-icon"><ion-icon name="cash"></ion-icon></div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Settlements</div>
+                                <div id="summaryPaid" class="stat-value">₹ 0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card stat-primary">
+                            <div class="stat-icon"><ion-icon name="cart"></ion-icon></div>
+                            <div class="stat-content">
+                                <div class="stat-label">Total Orders</div>
+                                <div id="summaryOrders" class="stat-value">0</div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="summaryContainers" style="font-size: 24px; font-weight: 700; color: var(--warning);">0</div>
                 </div>
-                <div class="card" style="padding: 16px; border-left: 4px solid var(--success);">
-                    <div style="color: var(--text-muted); font-size: 13px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
-                        <ion-icon name="cash-outline"></ion-icon> Total Paid
-                    </div>
-                    <div id="summaryPaid" style="font-size: 24px; font-weight: 700; color: var(--success);">₹ 0</div>
-                </div>
+                <style>
+                    .stat-card {
+                        padding: 16px 20px;
+                        background: #ffffff;
+                        border: 1px solid var(--border);
+                        border-radius: 16px;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 12px;
+                        transition: transform 0.2s, box-shadow 0.2s;
+                        height: 100%;
+                        justify-content: center;
+                    }
+                    .stat-card:hover {
+                        transform: translateY(-2px);
+                        box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+                    }
+                    .stat-icon {
+                        width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px;
+                    }
+                    .stat-content {
+                        display: flex; flex-direction: column; gap: 4px;
+                    }
+                    .stat-label {
+                        font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
+                    }
+                    .stat-value {
+                        font-size: 24px; font-weight: 800;
+                    }
+
+                    .stat-danger { border-bottom: 4px solid var(--danger); }
+                    .stat-danger .stat-icon { background: #fff0f0; color: var(--danger); }
+                    .stat-danger .stat-value { color: var(--danger); }
+
+                    .stat-warning { border-bottom: 4px solid var(--warning); }
+                    .stat-warning .stat-icon { background: #fff8e6; color: var(--warning); }
+                    .stat-warning .stat-value { color: var(--warning); }
+
+                    .stat-success { border-bottom: 4px solid var(--success); }
+                    .stat-success .stat-icon { background: #eef9f2; color: var(--success); }
+                    .stat-success .stat-value { color: var(--success); }
+
+                    .stat-primary { border-bottom: 4px solid var(--primary); }
+                    .stat-primary .stat-icon { background: #f0f7f3; color: var(--primary); }
+                    .stat-primary .stat-value { color: var(--primary); }
+
+                    @media (max-width: 1200px) {
+                        #vendorSummaryContainer {
+                            grid-template-columns: 1fr;
+                            gap: 24px;
+                        }
+                        #profileSectionBorder {
+                            border-right: none !important;
+                            border-bottom: 1px solid var(--border);
+                            padding-right: 0 !important;
+                            padding-bottom: 24px;
+                        }
+                        #statsSectionGrid {
+                            grid-template-columns: repeat(4, 1fr);
+                        }
+                    }
+                    @media (max-width: 900px) {
+                        #statsSectionGrid {
+                            grid-template-columns: repeat(2, 1fr);
+                        }
+                    }
+                    @media (max-width: 500px) {
+                        #statsSectionGrid {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                </style>
             </div>
         </div>
 
-        <div class="card">
-          <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 16px 20px;">
-            <div class="card-title"><ion-icon name="list-outline"></ion-icon> Transaction History</div>
+        <div class="card" style="border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+          <div class="card-header" style="flex-wrap: wrap; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border);">
+            <div class="card-title" style="font-size: 18px; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 10px;">
+                <div style="width: 36px; height: 36px; border-radius: 10px; background: #f8f9fa; color: var(--text-main); display: flex; align-items: center; justify-content: center;">
+                    <ion-icon name="list" style="font-size: 20px;"></ion-icon>
+                </div>
+                Transaction History
+            </div>
             <div class="card-actions"
               style="display:flex; gap: 12px; align-items: center; flex: 1; justify-content: flex-end;">
               
-              <input type="date" id="dateFilter" class="form-control" style="padding: 8px 12px; font-size: 13px; max-width: 150px;" />
+              <input type="date" id="dateFilter" class="form-control" style="padding: 12px 16px; font-size: 14px; max-width: 160px; border-radius: 12px; background: #f8f9fa; border: 1px solid var(--border);" />
               
-              <div class="input-with-icon" style="max-width: 200px;">
-                <ion-icon name="search-outline"></ion-icon>
+              <div class="input-with-icon" style="max-width: 250px;">
+                <ion-icon name="search"></ion-icon>
                 <input type="text" id="searchFilter" class="form-control" placeholder="Search ID..."
-                  style="padding: 10px 14px 10px 40px; font-size: 13px;" />
+                  style="padding: 12px 16px 12px 42px; font-size: 14px; border-radius: 12px; background: #f8f9fa; border: 1px solid var(--border);" />
               </div>
             </div>
           </div>
           <div class="card-body" style="padding: 0; overflow-x: auto;">
-            <table>
+            <table style="width: 100%; border-collapse: collapse;">
               <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Transaction ID</th>
-                  <th>Vendor</th>
-                  <th>Amount</th>
-                  <th>Payment Method</th>
-                  <th>Status</th>
+                <tr style="background: #f8f9fa; border-bottom: 2px solid var(--border);">
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Date</th>
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Transaction ID</th>
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Vendor</th>
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Amount</th>
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Payment Method</th>
+                  <th style="padding: 16px 24px; text-align: left; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Collected By</th>
+                  <th style="padding: 16px 24px; text-align: center; font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Status</th>
                 </tr>
               </thead>
               <tbody id="transactions_table_body">
                 <tr>
-                  <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">Loading
-                    transactions...</td>
+                  <td colspan="7" style="text-align: center; padding: 48px 24px; color: var(--text-muted); font-size: 14px;">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                        <ion-icon name="sync" style="font-size: 24px; animation: spin 1s linear infinite;"></ion-icon>
+                        Loading transactions...
+                    </div>
+                  </td>
                 </tr>
               </tbody>
             </table>
+            <style>
+                @keyframes spin { 100% { transform: rotate(360deg); } }
+                #transactions_table_body td { padding: 16px 24px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-main); }
+                #transactions_table_body tr:hover { background: #f8f9fa; }
+            </style>
           </div>
         </div>
 
