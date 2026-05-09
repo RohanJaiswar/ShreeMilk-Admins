@@ -1507,27 +1507,67 @@ function initSupabaseForms() {
                 btnSendNotif.disabled = true;
 
                 try {
+                    const vendorId = recipientType === 'specific_vendor' ? specificVendorId : null;
                     const notifData = {
                         title,
                         message,
                         recipient_type: recipientType,
-                        vendor_id: recipientType === 'specific_vendor' ? specificVendorId : null,
+                        vendor_id: vendorId,
                         type: 'Manual',
                         status: 'Sent'
                     };
 
-                    const { error } = await supabaseClient.from('notifications').insert([notifData]);
-                    if (error) throw error;
+                    // 1. Trigger Push Notification via Edge Function (Primary Action)
+                    const pushPayload = {
+                        vendor_id: vendorId,
+                        title: title,
+                        body: message,
+                        type: 'order'
+                    };
 
-                    if (typeof showToast === 'function') showToast('Notification sent successfully!', 'success');
-                    else alert('✅ Notification sent!');
+                    let pushSuccess = false;
+                    try {
+                        const { data: pushData, error: pushError } = await supabaseClient.functions.invoke('send-push-notification', {
+                            body: pushPayload
+                        });
 
-                    // Reset form
-                    document.getElementById('notif_title').value = '';
-                    document.getElementById('notif_message').value = '';
-                    fetchNotifications();
+                        if (pushError) {
+                            console.error("Push Notification Error:", pushError);
+                            // Try to get a helpful message from the function error
+                            let msg = "Failed to send push notification.";
+                            if (pushError.context && pushError.context.status === 400) {
+                                msg = "Recipients not found or FCM error. Check console.";
+                            }
+                            alert("❌ Push Error: " + msg);
+                        } else {
+                            pushSuccess = true;
+                        }
+                    } catch (pushErr) {
+                        console.error("Invoke Error for Edge Function:", pushErr);
+                        alert("❌ Error calling function: " + pushErr.message);
+                    }
+
+                    // 2. Log to Database (Optional)
+                    try {
+                        await supabaseClient.from('notifications').insert([notifData]);
+                    } catch (dbErr) {
+                        console.warn("Database logging failed:", dbErr);
+                    }
+
+                    if (pushSuccess) {
+                        if (typeof showToast === 'function') showToast('Push notification sent successfully!', 'success');
+                        else alert('✅ Push notification sent!');
+                        
+                        // Reset form
+                        document.getElementById('notif_title').value = '';
+                        document.getElementById('notif_message').value = '';
+                        if (typeof fetchNotifications === 'function') fetchNotifications();
+                    } else {
+                        alert('❌ Failed to send push notification. Check console for details.');
+                    }
+
                 } catch (err) {
-                    console.error("Error sending notification:", err);
+                    console.error("Unexpected Error:", err);
                     alert('❌ Error: ' + err.message);
                 } finally {
                     btnSendNotif.innerHTML = originalText;
@@ -1577,6 +1617,10 @@ async function fetchNotifications() {
 
     } catch (err) {
         console.error("Error fetching notifications:", err);
+        // If table doesn't exist, we just leave the table as is or show a subtle hint
+        if (err.message && err.message.includes("could not find the table")) {
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">Notification history is unavailable (table not found).</td></tr>';
+        }
     }
 }
 

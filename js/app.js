@@ -88,7 +88,7 @@ window.toggleKpiMask = function() {
 /* ── KPI CARDS ── */
 function renderKpi() {
   const grid = document.getElementById('kpiGrid');
-  if (!grid) return;
+  if (!grid || typeof DATA === 'undefined' || !DATA.kpi) return;
   grid.innerHTML = DATA.kpi.map(k => `
     <div class="kpi-card ${k.color}" title="${k.label}">
       <div class="kpi-label">${k.label}</div>
@@ -111,6 +111,7 @@ function statusTag(s) {
 }
 
 function filteredVendors() {
+  if (typeof DATA === 'undefined' || !DATA.vendors) return [];
   return DATA.vendors.filter(v => {
     const zoneOk = vendorFilters.zone === 'all' || v.zone === vendorFilters.zone;
     const statusOk = vendorFilters.status === 'all' || v.status === vendorFilters.status;
@@ -201,7 +202,7 @@ function sparklineHTML(vals) {
 
 function renderProductsTable() {
   const tbody = document.getElementById('productsTbody');
-  if (!tbody) return;
+  if (!tbody || typeof DATA === 'undefined' || !DATA.products) return;
   const rows = DATA.products[productPeriod] || [];
   tbody.innerHTML = rows.map(p => `
     <tr>
@@ -234,6 +235,7 @@ function initProductsTable() {
 
 /* ── DELIVERY STATUS ── */
 function renderDelivery() {
+  if (typeof DATA === 'undefined' || !DATA.delivery) return;
   const { total, delivered, agents, missed } = DATA.delivery;
 
   /* Progress circle */
