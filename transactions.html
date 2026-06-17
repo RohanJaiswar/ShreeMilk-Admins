@@ -2,6 +2,11 @@
 <html lang="en">
 
 <head>
+  <script>
+    if (!window.location.pathname.endsWith('/index.html') && !window.location.pathname.endsWith('/')) {
+      window.location.href = 'index.html';
+    }
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Shreeji Milk Center — Transactions and Reports</title>
