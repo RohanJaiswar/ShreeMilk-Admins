@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Site Suspended — Shreeji Milk Center</title>
+  <title>Login — Shreeji Admin Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,9 +14,12 @@
       --card-border: rgba(255, 255, 255, 0.08);
       --text-main: #f3f4f6;
       --text-muted: #9ca3af;
-      --accent: #ef4444; /* Alert Red */
-      --accent-glow: rgba(239, 68, 68, 0.15);
-      --primary: #3b82f6; /* Blue contact accent */
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --input-bg: rgba(0, 0, 0, 0.2);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --input-focus: #3b82f6;
+      --error: #ef4444;
     }
 
     * {
@@ -29,22 +32,20 @@
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       background-image: 
-        radial-gradient(circle at 10% 20%, rgba(239, 68, 68, 0.08) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 40%);
+        radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 24px;
-      overflow: hidden;
     }
 
     .container {
-      max-width: 540px;
+      max-width: 440px;
       width: 100%;
-      text-align: center;
-      animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       opacity: 0;
     }
 
@@ -62,126 +63,93 @@
     .card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 48px 40px;
+      border-radius: 20px;
+      padding: 40px;
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       box-shadow: 
         0 4px 30px rgba(0, 0, 0, 0.4),
         0 1px 3px rgba(0, 0, 0, 0.2);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--primary));
-    }
-
-    .icon-wrapper {
-      width: 80px;
-      height: 80px;
-      background: var(--accent-glow);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 28px;
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
-      animation: pulseGlow 2.5s infinite ease-in-out;
-    }
-
-    .icon-wrapper svg {
-      width: 38px;
-      height: 38px;
-      fill: var(--accent);
     }
 
     h1 {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      margin-bottom: 16px;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-align: center;
       background: linear-gradient(135deg, #ffffff 60%, #a3a3a3 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.2);
-      color: #fca5a5;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      padding: 6px 14px;
-      border-radius: 100px;
-      margin-bottom: 24px;
-    }
-
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-    }
-
-    p.message {
-      font-size: 15px;
-      line-height: 1.6;
+    p.subtitle {
+      text-align: center;
       color: var(--text-muted);
+      font-size: 14px;
       margin-bottom: 32px;
     }
 
-    .contact-box {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      border-radius: 16px;
-      padding: 20px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
+    .form-group {
+      margin-bottom: 20px;
     }
 
-    .contact-box:hover {
-      background: rgba(255, 255, 255, 0.04);
-      border-color: rgba(255, 255, 255, 0.1);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    }
-
-    .contact-label {
-      font-size: 12px;
-      font-weight: 600;
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
       color: var(--text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      margin-bottom: 8px;
     }
 
-    .contact-name {
-      font-size: 18px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.01em;
+    .form-group input {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-main);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 15px;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
-    .footer-note {
-      margin-top: 32px;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.25);
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-login {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+    }
+
+    .btn-login:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-login:active {
+      transform: translateY(0);
+    }
+
+    .error-msg {
+      color: var(--error);
+      font-size: 13px;
+      text-align: center;
+      margin-top: 16px;
+      display: none;
+      font-weight: 500;
     }
 
     @keyframes fadeInUp {
@@ -194,53 +162,67 @@
         transform: translateY(0);
       }
     }
-
-    @keyframes pulseGlow {
-      0%, 100% {
-        box-shadow: 0 0 20px rgba(239, 68, 68, 0.1);
-        border-color: rgba(239, 68, 68, 0.2);
-      }
-      50% {
-        box-shadow: 0 0 32px rgba(239, 68, 68, 0.3);
-        border-color: rgba(239, 68, 68, 0.4);
-      }
-    }
   </style>
 </head>
 <body>
+
   <div class="container">
     <div class="logo-container">
       <img src="assets/logo-shree.png" alt="Shreeji Milk Center" onerror="this.style.display='none'">
     </div>
     
     <div class="card">
-      <div class="icon-wrapper">
-        <!-- Shield Alert / Lock icon -->
-        <svg viewBox="0 0 24 24">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
-        </svg>
-      </div>
-
-      <div class="status-badge">
-        <span class="status-dot"></span>
-        Administrative Hold
-      </div>
-
-      <h1>Access Suspended</h1>
+      <h1>Admin Login</h1>
+      <p class="subtitle">Enter your credentials to access the portal</p>
       
-      <p class="message">
-        This site has been taken down by the administrator. All features and dashboard access are temporarily disabled.
-      </p>
-
-      <div class="contact-box">
-        <span class="contact-label">Please Contact</span>
-        <span class="contact-name">Ashish Khobragade</span>
-      </div>
-    </div>
-
-    <div class="footer-note">
-      Shreeji Milk Center — Admin Portal
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Email / Username</label>
+          <input type="text" id="username" placeholder="Enter your username" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required>
+        </div>
+        
+        <button type="submit" class="btn-login">Sign In</button>
+        
+        <div class="error-msg" id="errorMsg">Invalid username or password.</div>
+      </form>
     </div>
   </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const user = document.getElementById('username').value.trim();
+      const pass = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+      
+      // Static credentials
+      if (user === 'ajayprasad' && pass === 'ajay4321') {
+        errorMsg.style.display = 'none';
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+      } else {
+        errorMsg.style.display = 'block';
+        // Shake animation on error
+        const card = document.querySelector('.card');
+        card.animate([
+          { transform: 'translateX(0)' },
+          { transform: 'translateX(-5px)' },
+          { transform: 'translateX(5px)' },
+          { transform: 'translateX(-5px)' },
+          { transform: 'translateX(5px)' },
+          { transform: 'translateX(0)' }
+        ], {
+          duration: 400,
+          iterations: 1
+        });
+      }
+    });
+  </script>
 </body>
 </html>

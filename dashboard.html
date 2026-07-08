@@ -2,21 +2,112 @@
 <html lang="en">
 
 <head>
-  <script>
-    if (!window.location.pathname.endsWith('/index.html') && !window.location.pathname.endsWith('/')) {
-      window.location.href = 'index.html';
-    }
-  </script>
+  <!-- Login check handled elsewhere -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shreeji Milk Center — Overview</title>
+  <meta name="description" content="Production-grade Admin Dashboard for Shreeji Milk Center dairy delivery business." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/styles.css" />
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-
 <body style="background: var(--bg-main);">
-  <main class="content">
+<div class="overlay" id="overlay"></div>
+
+  <div class="layout">
+
+    <!-- ═══════════════ SIDER ═══════════════ -->
+    <aside class="sider" id="sider">
+      <div class="sider-logo">
+        <img src="assets/logo-shree.png" alt="Shreeji Milk Center" />
+
+      </div>
+      <nav class="nav-menu">
+        <a href="dashboard.html" class="nav-item active" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="home-outline"></ion-icon></span><span
+            class="nav-label">Dashboard</span>
+        </a>
+        <a href="delivery.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="bus-outline"></ion-icon></span><span class="nav-label">Delivery &
+            Orders</span>
+        </a>
+        <a href="vendors.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="storefront-outline"></ion-icon></span><span class="nav-label">Vendors &
+            Logistics</span>
+        </a>
+        <a href="transactions.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="card-outline"></ion-icon></span><span class="nav-label">Transactions
+            and Reports</span>
+        </a>
+        <a href="notifications.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="notifications-outline"></ion-icon></span><span class="nav-label">Notification Center</span>
+        </a>
+        <a href="app-settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="options-outline"></ion-icon></span><span class="nav-label">Application Settings</span>
+        </a>
+        <a href="settings.html" class="nav-item" style="text-decoration: none;">
+          <span class="nav-icon"><ion-icon name="settings-outline"></ion-icon></span><span
+            class="nav-label">Settings</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- ═══════════════ MAIN WRAPPER ═══════════════ -->
+    <div class="main-wrapper" id="mainWrapper">
+
+      <!-- ── HEADER ── -->
+      <header class="header">
+        <button class="header-toggle" id="sideToggle" aria-label="Toggle Sidebar"><ion-icon
+            name="menu-outline"></ion-icon></button>
+        <div class="header-breadcrumb">
+          Dashboard &rsaquo; <span>Overview</span>
+        </div>
+        <div class="header-right">
+          <!-- Brand Logo in Top Right -->
+          <div class="header-logo"
+            style="display:flex; align-items:center; margin-right: 12px; padding-right: 16px; border-right: 1px solid var(--border);">
+            <img src="assets/logo-shree.png" alt="Shree Milk" style="height: 48px;" />
+          </div>
+
+          <span class="header-date" id="headerDate"></span>
+          <button class="notif-btn" aria-label="Notifications" onclick="alert('3 new notifications')">
+            <ion-icon name="notifications-outline"></ion-icon><span class="notif-badge"></span>
+          </button>
+          <div class="user-info" onclick="toggleProfileMenu(event)">
+            <div class="user-avatar">RS</div>
+            <div style="display:flex;flex-direction:column;justify-content:center;">
+              <span class="user-name">Rahul Sharma</span>
+              <span class="user-role">Administrator</span>
+            </div>
+            <ion-icon name="chevron-down-outline" style="color: var(--text-muted); margin-left: 4px;"></ion-icon>
+
+            <div class="profile-dropdown" id="profileDropdown" onclick="event.stopPropagation()">
+              <div class="profile-header">
+                <div class="profile-avatar-small">RS</div>
+                <div class="profile-details">
+                  <span class="profile-name">Rahul Sharma</span>
+                  <span class="profile-email">rahul@shreejimilk.com</span>
+                </div>
+              </div>
+              <div class="profile-menu">
+                <a href="settings.html"><ion-icon name="person-outline"></ion-icon> My Profile</a>
+                <a href="settings.html"><ion-icon name="settings-outline"></ion-icon> Account Settings</a>
+              </div>
+              <div class="profile-logout">
+                <a href="#"><ion-icon name="log-out-outline"></ion-icon> Logout</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- ═══════════════ CONTENT ═══════════════ -->
+      
+<main class="content">
 
     <!-- ─── SECTION 7: QUICK ACTIONS (top for easy access) ─── -->
     <div class="quick-actions" id="quickActions">
@@ -192,9 +283,11 @@
     </div>
 
   </main><!-- /content -->
+  </div><!-- /wrapper -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/supabase-integration.js"></script>
   <script src="js/data.js"></script>
   <script src="js/charts.js"></script>
   <script src="js/app.js"></script>
 </body>
-
 </html>
